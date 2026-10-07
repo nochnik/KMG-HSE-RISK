@@ -167,3 +167,16 @@ input[type=range]{width:100%;accent-color:var(--чернила)}
 
 /* Печать */
 @media print{.шапка{position:static}.кнопка{display:none}}
+
+/* Телефон: шапка в две строки, таблицы со своей прокруткой */
+@media(max-width:800px){
+  .шапка .внутри{flex-wrap:wrap;gap:8px 12px}
+  .шапка .лого{font-size:18px}
+  .шапка nav{order:3;width:100%;gap:2px}
+  .шапка nav a{padding:6px 10px;font-size:15px}
+  .шапка .демо{margin-left:auto;font-size:13px;padding:4px 8px}
+  table.таблица{display:block;overflow-x:auto;white-space:nowrap}
+  .тепло{overflow-x:auto}
+  .лента{overflow-x:auto;grid-template-columns:200px repeat(6,120px)}
+  .число{font-size:48px}
+}

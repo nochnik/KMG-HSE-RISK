@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Схемы для заявок</title>
+<link rel="stylesheet" href="стиль.css">
+<style>
+  .лист{background:#fff;border:2px solid var(--чернила);border-radius:var(--радиус);padding:28px 32px;margin:0 auto 40px;max-width:1640px}
+  .лист h2{margin-bottom:6px}
+  .схема text{font-size:18px}
+  .схема .заг{font-weight:700;font-size:20px}
+  .схема .подпись{font-size:15px}
+  .схема .мелко{font-size:14px;fill:var(--второй)}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="подрядчик.html">Подрядчики</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <span class="плашка демо">Схемы для форм заявок</span>
+</div></header>
+
+<main class="страница">
+
+<section class="лист" id="лист-A">
+  <h2>Индекс риска работ повышенной опасности</h2>
+  <p class="подпись">Источники → индекс → светофор наряда. Обратная связь от актов расследования.</p>
+  <div class="схема">
+  <svg id="схема-A" viewBox="0 0 1560 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема контура индекса риска">
+    <defs>
+      <marker id="стрА" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#101828"/></marker>
+    </defs>
+    <!-- источники -->
+    <g>
+      <rect class="рамка" x="20" y="22" width="380" height="64" rx="6"/><text x="40" y="50" class="заг">ЭНД</text><text x="40" y="74" class="подпись">наряды, состав бригады, инструктажи, ГВС</text>
+      <rect class="рамка" x="20" y="104" width="380" height="64" rx="6"/><text x="40" y="132" class="заг">TUMAR</text><text x="40" y="156" class="подпись">нарушения СИЗ и опасной зоны по бригаде</text>
+      <rect class="рамка" x="20" y="186" width="380" height="64" rx="6"/><text x="40" y="214" class="заг">Управление поездками</text><text x="40" y="238" class="подпись">скорость и режим труда водителей</text>
+      <rect class="рамка" x="20" y="268" width="380" height="64" rx="6"/><text x="40" y="296" class="заг">Қорғау</text><text x="40" y="320" class="подпись">незакрытые сообщения об опасности</text>
+      <rect class="рамка" x="20" y="350" width="380" height="64" rx="6"/><text x="40" y="378" class="заг">Реестр инцидентов</text><text x="40" y="402" class="подпись">история объекта и вида работ</text>
+      <rect class="рамка" x="20" y="432" width="380" height="64" rx="6"/><text x="40" y="460" class="заг">Фото места работ</text><text x="40" y="484" class="подпись">телефон мастера, ИИ-проверка СИЗ и ограждений</text>
+    </g>
+    <!-- стрелки к центру -->
+    <g class="линия" marker-end="url(#стрА)">
+      <path d="M400 54 C470 54 470 259 560 259"/>
+      <path d="M400 136 C470 136 470 259 560 259"/>
+      <path d="M400 218 C470 218 470 259 560 259"/>
+      <path d="M400 300 C470 300 470 259 560 259"/>
+      <path d="M400 382 C470 382 470 259 560 259"/>
+      <path d="M400 464 C470 464 470 259 560 259"/>
+    </g>
+    <!-- центр -->
+    <rect class="рамка акцент" x="560" y="170" width="420" height="180" rx="8"/>
+    <text x="770" y="222" text-anchor="middle" class="заг" style="font-size:24px">Индекс риска</text>
+    <text x="770" y="252" text-anchor="middle" class="заг">наряда и бригады</text>
+    <text x="770" y="284" text-anchor="middle" class="подпись">опережающие индикаторы, не прогноз НС</text>
+    <text x="770" y="308" text-anchor="middle" class="подпись">своя и подрядная бригада — одинаково</text>
+    <text x="770" y="334" text-anchor="middle" class="мелко">АСДЦ · модель KMG Digital</text>
+    <!-- выходы -->
+    <g class="линия" marker-end="url(#стрА)">
+      <path d="M980 230 C1040 230 1040 90 1100 90"/>
+      <path d="M980 260 C1040 260 1040 260 1100 260"/>
+      <path d="M980 290 C1040 290 1040 430 1100 430"/>
+    </g>
+    <g>
+      <rect class="рамка" x="1100" y="50" width="440" height="80" rx="6"/><circle class="з" cx="1130" cy="90" r="13"/><text x="1156" y="84" class="заг">Зелёный</text><text x="1156" y="110" class="подпись">обычный порядок допуска</text>
+      <rect class="рамка" x="1100" y="220" width="440" height="80" rx="6"/><circle class="ж" cx="1130" cy="260" r="13"/><text x="1156" y="254" class="заг">Жёлтый</text><text x="1156" y="280" class="подпись">целевой инструктаж, ИИ-мероприятия, мастер рядом</text>
+      <rect class="рамка" x="1100" y="390" width="440" height="80" rx="6"/><circle class="к" cx="1130" cy="430" r="13"/><text x="1156" y="424" class="заг">Красный</text><text x="1156" y="450" class="подпись">эскалация в службу ПБ, барьеры; решает человек</text>
+    </g>
+    <!-- обратная связь -->
+    <path class="линия" stroke-dasharray="8 6" marker-end="url(#стрА)" d="M1320 470 C1320 540 770 540 770 352"/>
+    <text x="1045" y="532" text-anchor="middle" class="подпись">акты расследования → извлечённые уроки → дообучение индекса</text>
+  </svg>
+  </div>
+</section>
+
+<section class="лист" id="лист-D">
+  <h2>Паспорт безопасности подрядчика в закупках</h2>
+  <p class="подпись">Те же источники → рейтинг A–D → гейт допуска в KMG AISAP.</p>
+  <div class="схема">
+  <svg id="схема-D" viewBox="0 0 1560 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема паспорта безопасности подрядчика">
+    <defs>
+      <marker id="стрD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#101828"/></marker>
+    </defs>
+    <!-- компоненты -->
+    <g>
+      <rect class="рамка" x="20" y="40" width="400" height="64" rx="6"/><text x="40" y="68" class="заг">НС и FAR подрядчика · 24 мес</text><text x="40" y="92" class="подпись">реестр инцидентов, все ДЗО · вес 35 %</text>
+      <rect class="рамка" x="20" y="124" width="400" height="64" rx="6"/><text x="40" y="152" class="заг">Нарушения на бригадах</text><text x="40" y="176" class="подпись">TUMAR, видеоаналитика заводов · вес 20 %</text>
+      <rect class="рамка" x="20" y="208" width="400" height="64" rx="6"/><text x="40" y="236" class="заг">ДТП и скорость техники</text><text x="40" y="260" class="подпись">«Управление поездками» · вес 15 %</text>
+      <rect class="рамка" x="20" y="292" width="400" height="64" rx="6"/><text x="40" y="320" class="заг">Предписания и аудиты</text><text x="40" y="344" class="подпись">закрытие замечаний ДПБ · вес 15 %</text>
+      <rect class="рамка" x="20" y="376" width="400" height="64" rx="6"/><text x="40" y="404" class="заг">Обучение и допуски</text><text x="40" y="428" class="подпись">персонал подрядчика · вес 15 %</text>
+      <text x="40" y="490" class="мелко">Веса утверждает ДПБ КМГ. Рейтинг обновляется ежемесячно, действует во всех ДЗО.</text>
+    </g>
+    <g class="линия" marker-end="url(#стрD)">
+      <path d="M420 72 C490 72 490 240 580 240"/>
+      <path d="M420 156 C490 156 490 240 580 240"/>
+      <path d="M420 240 C490 240 490 240 580 240"/>
+      <path d="M420 324 C490 324 490 240 580 240"/>
+      <path d="M420 408 C490 408 490 240 580 240"/>
+    </g>
+    <!-- паспорт -->
+    <rect class="рамка акцент" x="580" y="140" width="400" height="200" rx="8"/>
+    <text x="780" y="190" text-anchor="middle" class="заг" style="font-size:24px">Паспорт безопасности</text>
+    <text x="780" y="220" text-anchor="middle" class="заг">подрядчика · класс A–D</text>
+    <text x="780" y="256" text-anchor="middle" class="подпись">прозрачен подрядчику в личном кабинете AISAP</text>
+    <text x="780" y="280" text-anchor="middle" class="подпись">что снижает класс и как поднять</text>
+    <text x="780" y="316" text-anchor="middle" class="мелко">оспаривание — через службу ПБ ДЗО</text>
+    <!-- гейт -->
+    <path class="линия" marker-end="url(#стрD)" d="M980 240 L1090 240"/>
+    <rect class="рамка" x="1090" y="60" width="450" height="360" rx="8"/>
+    <text x="1315" y="100" text-anchor="middle" class="заг">KMG AISAP · допуск к тендеру</text>
+    <text x="1315" y="126" text-anchor="middle" class="подпись">лоты на работы повышенной опасности</text>
+    <g>
+      <circle class="з" cx="1125" cy="176" r="12"/><text x="1150" y="172" class="заг">A, B</text><text x="1150" y="196" class="подпись">допущен</text>
+      <circle class="ж" cx="1125" cy="256" r="12"/><text x="1150" y="252" class="заг">C</text><text x="1150" y="276" class="подпись">допуск с планом улучшений, оценка через 6 мес</text>
+      <circle class="к" cx="1125" cy="336" r="12"/><text x="1150" y="332" class="заг">D</text><text x="1150" y="356" class="подпись">работы повышенной опасности закрыты</text>
+      <text x="1150" y="380" class="подпись">доступны работы вне опасных зон</text>
+    </g>
+    <text x="1315" y="408" text-anchor="middle" class="мелко">требуемый класс задаёт заказчик в лоте</text>
+    <!-- обратная связь -->
+    <path class="линия" stroke-dasharray="8 6" marker-end="url(#стрD)" d="M1315 420 C1315 530 780 530 780 342"/>
+    <text x="1050" y="520" text-anchor="middle" class="подпись">план улучшений подрядчика → 90 дней без нарушений → пересчёт класса</text>
+  </svg>
+  </div>
+</section>
+
+</main>
+<footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</body>
+</html>

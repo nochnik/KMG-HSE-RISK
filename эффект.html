@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор эффекта</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="стиль.css">
+<style>
+  .заголовок{align-items:flex-start;flex-direction:column;gap:6px}
+  .разворот{grid-template-columns:1fr 1fr}
+  .ползунок:last-child{border-bottom:none}
+  .ползунок .значение{font-size:19px}
+  .горизонт{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+  .горизонт .кнопка{padding:10px 16px;font-size:var(--подпись)}
+  .результат .число{margin:6px 0 4px}
+  .результат .ед{font-size:var(--подпись);color:var(--второй);margin-bottom:14px}
+  .результат .рядом{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px}
+  .результат .рядом div{padding:10px 14px;border:2px solid var(--линия);border-radius:var(--радиус)}
+  .результат .рядом div.текущий{border-color:var(--чернила);background:var(--янтарь-фон)}
+  .результат .рядом .подпись{display:block;margin-bottom:2px}
+  .результат .рядом .моно{font-size:22px}
+  .результат .рядом .моно.плюс{color:var(--зелёный)}
+  .результат .рядом .моно.минус{color:var(--красный)}
+  .строки{list-style:none;margin:0 0 20px;padding:0}
+  .строки li{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--линия)}
+  .строки li.итог{font-weight:600;border-bottom:2px solid var(--чернила)}
+  .строки li .моно{white-space:nowrap}
+  pre.моно{font-size:15px;line-height:1.6;background:var(--бумага);border:1.5px solid var(--линия);border-radius:4px;padding:12px 14px;margin:8px 0 0;white-space:pre-wrap;font-weight:500}
+  .результат h4,.источники h3{font-size:17px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em;color:var(--второй);font-weight:600}
+  .источники{margin-top:20px}
+  .источники ul{margin:0;padding-left:22px}
+  .источники li{padding:5px 0}
+  .источники .вывод{margin:18px 0 0;font-size:20px;font-weight:600;padding:14px 18px;border-left:6px solid var(--сигнал);background:#fff}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html" class="активна">Эффект</a><a href="подрядчик.html">Подрядчики</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <span class="плашка демо">Демонстрационные данные</span>
+</div></header>
+
+<main class="страница">
+  <div class="заголовок">
+    <h1>Сколько стоит предотвращённый несчастный случай</h1>
+    <p class="лид">Все параметры — оценка. Заменяются данными ДПБ и колдоговоров ДЗО. Формула открыта.</p>
+  </div>
+
+  <div class="разворот">
+    <div class="карточка" id="параметры">
+      <h3>Параметры</h3>
+      <div class="ползунок">
+        <label for="нс">Несчастных случаев в год на работах под контуром (одно ДЗО)</label>
+        <span class="значение" data-для="нс"></span>
+        <input type="range" id="нс" min="2" max="40" step="1" value="12">
+        <span class="подпись">Оценка; заменить на данные ДПБ по нарядам повышенной опасности</span>
+      </div>
+      <div class="ползунок">
+        <label for="д_смерт">Доля смертельных, %</label>
+        <span class="значение" data-для="д_смерт"></span>
+        <input type="range" id="д_смерт" min="0" max="20" step="1" value="5">
+      </div>
+      <div class="ползунок">
+        <label for="д_тяж">Доля тяжёлых (инвалидность), %</label>
+        <span class="значение" data-для="д_тяж"></span>
+        <input type="range" id="д_тяж" min="0" max="60" step="1" value="25">
+        <span class="подпись">Остальное — лёгкие: <b class="моно" id="д_лёгк"></b> %</span>
+      </div>
+      <div class="ползунок">
+        <label for="c_смерт">Цена смертельного НС для работодателя, млн тг</label>
+        <span class="значение" data-для="c_смерт"></span>
+        <input type="range" id="c_смерт" min="20" max="200" step="1" value="100">
+        <span class="подпись">10 годовых зарплат по колдоговору + погребение + страховые выплаты</span>
+      </div>
+      <div class="ползунок">
+        <label for="c_тяж">Цена тяжёлого НС, млн тг</label>
+        <span class="значение" data-для="c_тяж"></span>
+        <input type="range" id="c_тяж" min="5" max="60" step="1" value="25">
+      </div>
+      <div class="ползунок">
+        <label for="c_лёгк">Цена лёгкого НС, млн тг</label>
+        <span class="значение" data-для="c_лёгк"></span>
+        <input type="range" id="c_лёгк" min="0.5" max="5" step="0.5" value="2">
+      </div>
+      <div class="ползунок">
+        <label for="k_косв">Коэффициент косвенных затрат</label>
+        <span class="значение" data-для="k_косв"></span>
+        <input type="range" id="k_косв" min="0" max="4" step="0.5" value="2">
+        <span class="подпись">Простой, расследование, замена, репутация</span>
+      </div>
+      <div class="ползунок">
+        <label for="снижение">Снижение НС под контуром, %</label>
+        <span class="значение" data-для="снижение"></span>
+        <input type="range" id="снижение" min="5" max="40" step="1" value="15">
+        <span class="подпись">Консервативно; референсы 20–40 % для серьёзных травм</span>
+      </div>
+      <div class="ползунок">
+        <label for="затраты">Затраты на внедрение в первый год, млн тг</label>
+        <span class="значение" data-для="затраты"></span>
+        <input type="range" id="затраты" min="20" max="500" step="10" value="120">
+        <span class="подпись">Сопровождение в последующие годы — 20 % от внедрения; каждое следующее ДЗО — 40 % от первого (интеграция готова)</span>
+      </div>
+      <div class="ползунок">
+        <label for="дзо">Число ДЗО в тираже</label>
+        <span class="значение" data-для="дзо"></span>
+        <input type="range" id="дзо" min="1" max="7" step="1" value="1">
+      </div>
+    </div>
+
+    <div class="карточка результат">
+      <h3>Горизонт</h3>
+      <div class="горизонт" id="горизонт">
+        <button class="кнопка вторая" data-горизонт="год1">Первый год (с затратами внедрения)</button>
+        <button class="кнопка" data-горизонт="послед">Последующие годы (сопровождение 20 % от внедрения)</button>
+      </div>
+
+      <div class="подпись">Эффект в год, одно ДЗО</div>
+      <div class="число" id="эффект">0</div>
+      <div class="ед">млн тг в год</div>
+
+      <div class="рядом">
+        <div id="блок_год1"><span class="подпись">Первый год</span><span class="моно" id="эфф_год1"></span></div>
+        <div id="блок_послед"><span class="подпись">Последующие годы</span><span class="моно" id="эфф_послед"></span></div>
+      </div>
+
+      <ul class="строки">
+        <li><span>Предотвращено НС в год</span><span class="моно" id="нс_предотвр"></span></li>
+        <li><span>Прямые выплаты, предотвращённые</span><span class="моно" id="прямые"></span></li>
+        <li><span>С косвенными</span><span class="моно" id="с_косв"></span></li>
+        <li><span id="затраты_подпись">Затраты</span><span class="моно" id="затраты_знач"></span></li>
+        <li id="строка_окуп"><span>Окупаемость внедрения</span><span class="моно" id="окуп"></span></li>
+        <li class="итог"><span id="тираж_подпись">При тираже</span><span class="моно" id="тираж_знач"></span></li>
+        <li class="итог"><span id="тираж3_подпись">За 3 года при тираже</span><span class="моно" id="тираж3_знач"></span></li>
+      </ul>
+
+      <h4>Формула</h4>
+<pre class="моно">НС_предотвр = НС_в_год × снижение
+Прямые = НС_предотвр × (д_смерт × C_смерт + д_тяж × C_тяж + д_лёгк × C_лёгк)
+Эффект = Прямые × (1 + k_косв) − Затраты</pre>
+      <p class="подпись" style="margin-top:8px">Окупаемость — месяцы до выхода накопленного эффекта в плюс с учётом затрат первого года и сопровождения. Тираж: затраты на каждое следующее ДЗО — 40 % от первого.</p>
+    </div>
+  </div>
+
+  <section class="карточка тонкая источники">
+    <h3>Источники параметров</h3>
+    <ul>
+      <li>Колдоговоры крупных компаний РК: 10-кратная годовая зарплата семье при смертельном НС (практика 2025)</li>
+      <li>Закон РК об обязательном страховании работника от несчастных случаев: ежемесячные выплаты иждивенцам до пенсионного возраста от среднего заработка до 10 МЗП</li>
+      <li>ГК РК ст. 839: погребение 100 МРП = 432 500 тг (МРП 2026 = 4 325 тг)</li>
+      <li>КоАП РК ст. 93: штрафы 120–200 МРП для крупного бизнеса, 20–40 МРП для должностных лиц</li>
+      <li>УК РК ст. 156 ч. 3: до 5 лет лишения свободы для ответственного за ОТ при смерти работника</li>
+      <li>Отраслевые референсы: предиктивные оповещения по критическим задачам снижают серьёзные травмы и смерти на 20–40 %</li>
+    </ul>
+    <p class="вывод">Один предотвращённый смертельный случай подрядчика — это 100+ млн тг прямых выплат и уголовное дело, которого не будет.</p>
+  </section>
+
+  <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</main>
+
+<script>
+/*
+  Ручная проверка арифметики дефолтов (одно ДЗО):
+    НС_предотвр = 12 × 0,15 = 1,8
+    Прямые      = 1,8 × (0,05×100 + 0,25×25 + 0,70×2) = 1,8 × (5 + 6,25 + 1,4) = 1,8 × 12,65 = 22,77 млн
+    С косвенными = 22,77 × (1 + 2) = 68,31 млн
+    Первый год:        68,31 − 120 = −51,69 млн   (отрицательно: затраты внедрения)
+    Последующие годы:  68,31 − 0,2×120 = 68,31 − 24 = 44,31 млн
+    Окупаемость: год 1 в минусе на 51,69; при +44,31 в год накопленный эффект выходит в плюс
+                 через 12 + 51,69/44,31×12 = 12 + 14,0 = 26 мес.
+    За 3 года, 1 ДЗО: −51,69 + 2×44,31 = 36,93 млн
+    Тираж на N ДЗО: выгода ×N; затраты внедрения = З × (1 + 0,4×(N−1)); сопровождение = 20 % от них.
+      N=7: выгода 478,17; внедрение 120×3,4 = 408; сопровождение 81,6;
+           год 1 = 70,17; последующие = 396,57; за 3 года = 70,17 + 2×396,57 = 863,31 млн.
+*/
+(function(){
+  const ids = ['нс','д_смерт','д_тяж','c_смерт','c_тяж','c_лёгк','k_косв','снижение','затраты','дзо'];
+  const вх = {}; ids.forEach(id => вх[id] = document.getElementById(id));
+  let горизонт = 'послед';
+
+  function число(v, зн){ // форматирование: пробелы в тысячах, запятая, минус «−»
+    const отр = v < 0; const a = Math.abs(v);
+    let s = зн ? a.toFixed(зн).replace('.', ',') : String(Math.round(a));
+    const [ц, д] = s.split(',');
+    const цф = ц.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return (отр ? '−' : '') + цф + (д ? ','+д : '');
+  }
+  function знач(id){ return parseFloat(вх[id].value); }
+
+  function расчёт(){
+    const нс = знач('нс'), дс = знач('д_смерт')/100, дт = знач('д_тяж')/100;
+    const дл = Math.max(0, 1 - дс - дт);
+    const cс = знач('c_смерт'), cт = знач('c_тяж'), cл = знач('c_лёгк');
+    const k = знач('k_косв'), сн = знач('снижение')/100, З = знач('затраты'), N = знач('дзо');
+
+    const нс_пр = нс * сн;
+    const прямые = нс_пр * (дс*cс + дт*cт + дл*cл);
+    const с_косв = прямые * (1 + k);
+    const затр_год1 = З, затр_послед = 0.2 * З;
+    const год1 = с_косв - затр_год1;
+    const послед = с_косв - затр_послед;
+
+    const внедр_тираж = З * (1 + 0.4*(N-1));
+    const сопр_тираж = 0.2 * внедр_тираж;
+    const выгода_тираж = с_косв * N;
+    const год1_т = выгода_тираж - внедр_тираж;
+    const послед_т = выгода_тираж - сопр_тираж;
+    const три_года_т = год1_т + 2*послед_т;
+
+    let окуп = null;
+    if (год1 >= 0 && с_косв > 0) окуп = З / с_косв * 12;
+    else if (послед > 0) окуп = 12 + (-год1) / послед * 12;
+
+    return {нс_пр, прямые, с_косв, затр_год1, затр_послед, год1, послед, год1_т, послед_т, три_года_т, окуп, N, дл};
+  }
+
+  function вывод(){
+    ids.forEach(id => {
+      const v = знач(id);
+      const эл = document.querySelector('[data-для="'+id+'"]');
+      const ед = {нс:'', д_смерт:' %', д_тяж:' %', c_смерт:' млн', c_тяж:' млн', c_лёгк:' млн', k_косв:'', снижение:' %', затраты:' млн', дзо:''}[id];
+      эл.textContent = число(v, (id==='c_лёгк'||id==='k_косв') ? 1 : 0) + ед;
+    });
+    const р = расчёт();
+    document.getElementById('д_лёгк').textContent = Math.round(р.дл*100);
+
+    const эфф = горизонт==='год1' ? р.год1 : р.послед;
+    const э = document.getElementById('эффект');
+    э.textContent = (эфф > 0 ? '+' : '') + число(эфф);
+    э.className = 'число ' + (эфф > 0 ? 'зелёное' : эфф < 0 ? 'красное' : '');
+
+    const г1 = document.getElementById('эфф_год1'), пс = document.getElementById('эфф_послед');
+    г1.textContent = (р.год1>0?'+':'') + число(р.год1) + ' млн'; г1.className = 'моно ' + (р.год1>0?'плюс':р.год1<0?'минус':'');
+    пс.textContent = (р.послед>0?'+':'') + число(р.послед) + ' млн'; пс.className = 'моно ' + (р.послед>0?'плюс':р.послед<0?'минус':'');
+    document.getElementById('блок_год1').classList.toggle('текущий', горизонт==='год1');
+    document.getElementById('блок_послед').classList.toggle('текущий', горизонт==='послед');
+
+    document.getElementById('нс_предотвр').textContent = число(р.нс_пр, 1);
+    document.getElementById('прямые').textContent = число(р.прямые) + ' млн';
+    document.getElementById('с_косв').textContent = число(р.с_косв) + ' млн';
+    document.getElementById('затраты_подпись').textContent = горизонт==='год1' ? 'Затраты (внедрение, первый год)' : 'Затраты (сопровождение, 20 % от внедрения)';
+    document.getElementById('затраты_знач').textContent = число(горизонт==='год1' ? р.затр_год1 : р.затр_послед) + ' млн';
+
+    const ок = document.getElementById('строка_окуп');
+    if (эфф > 0 && р.окуп !== null){ ок.style.display = ''; document.getElementById('окуп').textContent = число(р.окуп) + ' мес'; }
+    else ок.style.display = 'none';
+
+    const гп = горизонт==='год1' ? 'первый год' : 'последующие годы';
+    document.getElementById('тираж_подпись').textContent = 'При тираже на ' + р.N + ' ДЗО (' + гп + ')';
+    const т = горизонт==='год1' ? р.год1_т : р.послед_т;
+    document.getElementById('тираж_знач').textContent = (т>0?'+':'') + число(т) + ' млн в год';
+    document.getElementById('тираж3_подпись').textContent = 'За 3 года при тираже на ' + р.N + ' ДЗО';
+    document.getElementById('тираж3_знач').textContent = (р.три_года_т>0?'+':'') + число(р.три_года_т) + ' млн';
+  }
+
+  ids.forEach(id => вх[id].addEventListener('input', вывод));
+  document.querySelectorAll('#горизонт button').forEach(б => б.addEventListener('click', () => {
+    горизонт = б.dataset.горизонт;
+    document.querySelectorAll('#горизонт button').forEach(x => x.classList.toggle('вторая', x!==б));
+    вывод();
+  }));
+  вывод();
+})();
+</script>
+</body>
+</html>

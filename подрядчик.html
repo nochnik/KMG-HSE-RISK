@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Паспорт безопасности подрядчика</title>
+<link rel="stylesheet" href="стиль.css">
+<style>
+  /* Страница «Паспорт безопасности подрядчика» — локальные стили */
+  .сводка .число{margin-bottom:6px}
+  .сводка .подпись{font-size:var(--текст);color:var(--второй)}
+  .класс{display:inline-flex;align-items:center;justify-content:center;min-width:42px;padding:4px 10px;border-radius:4px;font-family:var(--моно);font-weight:600;font-size:20px;border:2px solid currentColor;line-height:1}
+  .класс.A{color:var(--зелёный);background:var(--зелёный-фон)}
+  .класс.B{color:var(--синий);background:var(--синий-фон)}
+  .класс.C{color:var(--янтарь);background:var(--янтарь-фон)}
+  .класс.D{color:var(--красный);background:var(--красный-фон)}
+  .рейтинг{display:flex;align-items:center;gap:10px}
+  .рейтинг .шкала{width:96px;height:12px;flex:none}
+  .рейтинг .шкала i.A,.рейтинг .шкала i.B{background:var(--зелёный)}
+  .рейтинг .шкала i.B{background:var(--синий)}
+  .рейтинг .шкала i.C{background:var(--янтарь)}
+  .рейтинг .шкала i.D{background:var(--красный)}
+  .допуск{white-space:nowrap;font-weight:600}
+  .допуск.нет{color:var(--красный)}.допуск.усл{color:var(--янтарь)}.допуск.да{color:var(--зелёный)}
+  .заказчики{display:flex;flex-wrap:nowrap;gap:4px}
+  table.таблица td{vertical-align:middle;padding:10px 10px}
+  table.таблица th{padding:10px 10px}
+  table.таблица th.нп{white-space:nowrap}
+  table.таблица td.имя{font-weight:600;white-space:nowrap}
+  .паспорт .шапка-карточки{align-items:flex-start}
+  .паспорт .число.малое{line-height:1}
+  .паспорт .класс-подпись{font-size:var(--подпись);color:var(--второй);text-align:right}
+  .паспорт .мета{color:var(--второй);font-size:var(--подпись);margin-bottom:14px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+  .паспорт h4{font-size:var(--текст);margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em;color:var(--второй);font-weight:600}
+  .факторы li{align-items:center}
+  .факторы .имя-комп{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .факторы .вес{font-size:20px}
+  .гейт{margin-top:18px;padding:18px 20px}
+  .гейт .строка{display:grid;grid-template-columns:200px 1fr;gap:8px 16px;padding:8px 0;border-bottom:1px solid var(--линия);align-items:center}
+  .гейт .строка:last-of-type{border-bottom:none}
+  .гейт .строка .кл{color:var(--второй);font-size:var(--подпись)}
+  .гейт .итог{margin-top:12px;padding-top:12px;border-top:2px solid var(--чернила);display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .гейт .итог .свет{white-space:normal;line-height:1.3}
+  .гейт .итог .свет::before{flex:none}
+  .гейт .шаг{font-size:var(--подпись);color:var(--второй);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .гейт .шаг .бейдж{text-transform:none;letter-spacing:0}
+  .как{margin:0;padding-left:22px}
+  .как li{padding:4px 0}
+  .полоска{margin:0 0 24px}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="подрядчик.html" class="активна">Подрядчики</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <span class="плашка демо">Демонстрационные данные</span>
+</div></header>
+
+<main class="страница">
+  <div class="заголовок">
+    <div>
+      <h1>Паспорт безопасности подрядчика</h1>
+      <p class="лид">Рейтинг A–D из тех же данных, что и индекс риска. Учитывается в KMG AISAP при допуске к работам повышенной опасности. Подрядчики — 82 % смертельных случаев в отрасли (IOGP); у подрядчиков группы FAR 10,38 в 2025 году.</p>
+    </div>
+  </div>
+  <div class="полоска"></div>
+
+  <section class="сетка к4 сводка" id="сводка"></section>
+
+  <section class="разворот" style="margin-top:24px">
+    <div class="карточка">
+      <div class="шапка-карточки"><h3 style="margin:0">Реестр подрядчиков в пилоте</h3><span class="подпись">рейтинг за 24 месяца · клик по строке</span></div>
+      <table class="таблица" id="реестр">
+        <thead><tr>
+          <th>Класс</th><th>Подрядчик</th><th>Профиль</th><th class="право">Бригад</th><th class="право">Людей</th><th>Заказчики</th><th class="право нп">НС, 12 мес</th><th>Рейтинг</th><th>Допуск к работам<br>повышенной опасности</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <aside class="панель карточка паспорт" id="паспорт"></aside>
+  </section>
+
+  <p class="подпись" style="margin-top:28px">Рейтинг прозрачен для подрядчика в личном кабинете AISAP; оспаривание через службу ПБ ДЗО. Пилот: ОСК и ОТК — сервисные ДЗО с наибольшей долей подрядных бригад.</p>
+
+  <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</main>
+
+<script src="данные.js"></script>
+<script>
+(function(){
+  const П = window.ДАННЫЕ.ПОДРЯДЧИКИ;
+  function экр(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  const ДОПУСК = {'да':['да','да'], 'с условиями':['усл','с условиями'], 'нет':['нет','нет']};
+  const ЦВЕТ_ЧИСЛА = {A:'зелёное', B:'', C:'янтарное', D:'красное'};
+
+  // дефолт — первый класса D, иначе последний в списке
+  let выбран = П.findIndex(p=>p.класс==='D');
+  if (выбран < 0) выбран = П.length-1;
+
+  function сводка(){
+    const ab = П.filter(p=>p.класс==='A'||p.класс==='B').length;
+    const c = П.filter(p=>p.класс==='C').length;
+    const d = П.filter(p=>p.класс==='D').length;
+    const к = (ч, цвет, текст) => '<div class="карточка"><div class="число '+цвет+'">'+ч+'</div><div class="подпись">'+текст+'</div></div>';
+    document.getElementById('сводка').innerHTML =
+      к(П.length, '', 'подрядчиков в пилоте') +
+      к(ab, 'зелёное', 'класса A·B — допуск без условий') +
+      к(c, 'янтарное', 'класса C — допуск с условиями') +
+      к(d, 'красное', 'класса D — допуск закрыт');
+  }
+
+  function строка(p, i){
+    const [кл, текст] = ДОПУСК[p.допуск];
+    return '<tr class="кликабельна'+(i===выбран?' выбрана':'')+'" data-i="'+i+'">'+
+      '<td><span class="класс '+p.класс+'">'+p.класс+'</span></td>'+
+      '<td class="имя">'+экр(p.имя)+'</td>'+
+      '<td>'+экр(p.профиль)+'</td>'+
+      '<td class="право моно">'+p.бригад+'</td>'+
+      '<td class="право моно">'+p.людей+'</td>'+
+      '<td><span class="заказчики">'+p.заказчики.map(з=>'<span class="бейдж">'+з+'</span>').join('')+'</span></td>'+
+      '<td class="право моно'+(p.нс12>=2?' допуск нет':'')+'">'+p.нс12+'</td>'+
+      '<td><span class="рейтинг"><span class="моно">'+p.итог+'</span><span class="шкала"><i class="'+p.класс+'" style="width:'+p.итог+'%"></i></span></span></td>'+
+      '<td><span class="допуск '+кл+'">'+текст+'</span></td>'+
+      '</tr>';
+  }
+
+  function таблица(){
+    document.querySelector('#реестр tbody').innerHTML = П.map(строка).join('');
+  }
+
+  function паспорт(){
+    const p = П[выбран];
+    const компоненты = Object.values(p.компоненты).map(c=>{
+      const кл = c.балл>=80?'з':c.балл>=60?'ж':'к';
+      return '<li class="'+кл+'"><span class="имя-комп">'+экр(c.имя)+'<span class="бейдж">вес '+c.вес+' %</span></span><span class="вес">'+c.балл+'/100</span></li>';
+    }).join('');
+    let итог;
+    if (p.класс==='A'||p.класс==='B') итог = '<span class="свет з">Допущен</span>';
+    else if (p.класс==='C') итог = '<span class="свет ж">Допущен с планом улучшений, повторная оценка через 6 мес</span>';
+    else итог = '<span class="свет к">Не допущен к работам повышенной опасности. Доступны работы вне опасных зон</span>';
+
+    document.getElementById('паспорт').innerHTML =
+      '<div class="шапка-карточки">'+
+        '<div><h3 style="margin:0 0 4px">'+экр(p.имя)+'</h3><div class="мета"><span>'+экр(p.профиль)+'</span><span>·</span><span>бригад <b class="моно">'+p.бригад+'</b></span><span>·</span><span>людей <b class="моно">'+p.людей+'</b></span><span>·</span><span>заказчики '+p.заказчики.map(з=>'<span class="бейдж">'+з+'</span>').join(' ')+'</span></div></div>'+
+        '<div><div class="число малое '+ЦВЕТ_ЧИСЛА[p.класс]+'">'+p.класс+'</div><div class="класс-подпись">рейтинг '+p.итог+'/100</div></div>'+
+      '</div>'+
+      '<h4>Компоненты рейтинга</h4>'+
+      '<ul class="факторы">'+компоненты+'</ul>'+
+      '<div class="карточка тонкая гейт">'+
+        '<div class="шаг"><span class="бейдж синий">KMG AISAP</span>Шаг · допуск к тендеру на работы повышенной опасности</div>'+
+        '<div class="строка"><span class="кл">Лот</span><span>Текущий ремонт скважин, ОМГ, 2027</span></div>'+
+        '<div class="строка"><span class="кл">Требуемый класс</span><span>не ниже <span class="класс B">B</span></span></div>'+
+        '<div class="строка"><span class="кл">Класс участника</span><span><span class="класс '+p.класс+'">'+p.класс+'</span> · '+экр(p.имя)+'</span></div>'+
+        '<div class="итог">'+итог+'</div>'+
+      '</div>'+
+      '<h4>Как подрядчик поднимает класс</h4>'+
+      '<ol class="как">'+
+        '<li>Закрыть предписания и замечания аудитов — статус обновляется в паспорте автоматически.</li>'+
+        '<li>Обучить персонал и продлить допуски через ЭНД — компонент «Обучение» растёт сразу.</li>'+
+        '<li>90 дней без нарушений TUMAR на бригадах — пересчёт рейтинга и переход в класс выше.</li>'+
+      '</ol>';
+  }
+
+  function выбрать(i){
+    if (!(i in П)) return;
+    выбран = i;
+    document.querySelectorAll('#реестр tbody tr').forEach(tr=>tr.classList.toggle('выбрана', Number(tr.dataset.i)===i));
+    паспорт();
+  }
+  document.querySelector('#реестр tbody').addEventListener('click', e=>{
+    const tr = e.target.closest('tr'); if (tr) выбрать(Number(tr.dataset.i));
+  });
+
+  сводка(); таблица(); паспорт();
+})();
+</script>
+</body>
+</html>

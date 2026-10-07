@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дорожная карта тиража</title>
+<link rel="stylesheet" href="стиль.css">
+<style>
+  /* Страница «Дорожная карта» — локальные стили */
+  .лента{grid-template-columns:300px repeat(6,1fr)}
+  .лента .ряд{line-height:1.25;padding:10px 12px 10px 0}
+  .лента .ряд small{display:block;font-weight:400;color:var(--второй);font-size:var(--подпись);margin-top:2px}
+  .лента .кв.сейчас{color:var(--чернила)}
+  .лента .пусто-угол{border-bottom:2px solid var(--чернила);align-self:stretch}
+  .легенда{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin-top:16px;font-size:var(--подпись);color:var(--второй)}
+  .легенда span{display:inline-flex;align-items:center;gap:8px}
+  .легенда i{width:30px;height:18px;border-radius:4px;border:2px solid var(--чернила);display:inline-block}
+  .легенда i.пилот{background:var(--сигнал)}
+  .легенда i.тираж{background:var(--зелёный-фон);border-color:var(--зелёный)}
+  .легенда i.пусто{border:1px dashed var(--линия)}
+  .карточка.лента-карточка{margin-bottom:20px}
+  .карточка.лента-карточка .шапка-карточки{margin-bottom:16px}
+  .список{margin:0;padding-left:22px}
+  .список li{padding:4px 0}
+  .к3 .карточка h3{display:flex;align-items:center;gap:10px}
+  .к3 .карточка h3 svg{flex:none}
+  .полоска{margin:0 0 24px}
+  @media(max-width:1200px){.лента{grid-template-columns:200px repeat(6,1fr)}}
+  @media(max-width:800px){.лента{grid-template-columns:140px repeat(6,1fr)}.лента .блок{font-size:13px;height:36px}}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="подрядчик.html">Подрядчики</a><a href="дорожная_карта.html" class="активна">Дорожная карта</a></nav>
+ <span class="плашка демо">Демонстрационные данные</span>
+</div></header>
+
+<main class="страница">
+  <div class="заголовок">
+    <div>
+      <h1>Дорожная карта</h1>
+      <p class="лид">Пилот → тираж на ДЗО, где системы-источники уже работают → НПЗ. От ДЗО нужен только доступ к событиям систем, оборудование не требуется.</p>
+    </div>
+  </div>
+  <div class="полоска"></div>
+
+  <section class="карточка лента-карточка">
+    <div class="шапка-карточки"><h3 style="margin:0">Индекс риска работ повышенной опасности</h3><span class="бейдж синий">заявка · индекс риска</span></div>
+    <div class="лента" id="лента1"></div>
+  </section>
+
+  <section class="карточка лента-карточка">
+    <div class="шапка-карточки"><h3 style="margin:0">Паспорт безопасности подрядчика</h3><span class="бейдж синий">заявка · паспорт подрядчика</span></div>
+    <div class="лента" id="лента2"></div>
+    <div class="легенда">
+      <span><i class="пилот"></i>пилот — одна площадка, ручная сверка с ДПБ</span>
+      <span><i class="тираж"></i>тираж — подключение по событиям систем, без оборудования</span>
+      <span><i class="пусто"></i>не начато</span>
+    </div>
+  </section>
+
+  <section class="сетка к3">
+    <div class="карточка">
+      <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M7 9h6M7 13h10"/></svg>Что нужно от ДЗО</h3>
+      <ul class="список">
+        <li>Доступ к событиям ЭНД, TUMAR, «Поездок», «Қорғау» — не к видео и не к персональным данным.</li>
+        <li>Ответственный от службы ПБ ДЗО — сверка индекса с реальными нарядами.</li>
+        <li>Площадка пилота: ПСП или цех с 5–8 бригадами на работах повышенной опасности.</li>
+      </ul>
+    </div>
+    <div class="карточка">
+      <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Что делает KMG Digital</h3>
+      <ul class="список">
+        <li>Интеграция событий систем-источников в АСДЦ.</li>
+        <li>Модель индекса риска: факторы, веса, калибровка по актам расследования.</li>
+        <li>Экраны мастера и ДПБ, фотопроверка места работ, извлечённые уроки.</li>
+        <li>Модуль паспорта подрядчика в KMG AISAP.</li>
+      </ul>
+    </div>
+    <div class="карточка">
+      <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#101828" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M6 16V9M11 16V5M16 16v-6M21 16v-3"/></svg>Что измеряем</h3>
+      <ul class="список">
+        <li>Доля нарядов с жёлтым и красным индексом и их закрытие до начала работ.</li>
+        <li>Нарушения TUMAR на бригаду до и после подключения.</li>
+        <li>НС на работах повышенной опасности год к году.</li>
+        <li>FAR подрядчиков.</li>
+        <li>Время от акта расследования до рассылки урока.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="подпись" style="margin-top:28px">Сроки — оценка для заявки; уточняются с ДПБ и ДЗО-площадками.</p>
+
+  <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</main>
+
+<script>
+(function(){
+  const КВАРТАЛЫ = ['Q1 2027','Q2 2027','Q3 2027','Q4 2027','Q1 2028','Q2 2028'];
+  // п — пилот, т — тираж, о — обязательный гейт, пробел — пусто
+  const ЛЕНТА1 = [
+    ['ОМГ', 'пптттт', 'пилот: Озенмунайгаз, ПСП с TUMAR и ЭНД'],
+    ['ММГ и КБМ', '  тттт', 'ЭНД, «Поездки», «Қорғау» уже работают'],
+    ['ЭМГ и ОСК', '   ттт', 'ОСК — подрядные бригады, TUMAR'],
+    ['НПЗ: АНПЗ, ПНХЗ, ПКОП', '    тт', 'после видеоаналитики заводов и ЭНД НПЗ'],
+    ['Фотопроверка места работ', ' птттт', 'телефон мастера, без оборудования'],
+    ['Извлечённые уроки из актов', 'птттттт'.slice(0,6), 'разбор актов расследования, рассылка на похожие объекты'],
+  ];
+  const ЛЕНТА2 = [
+    ['ОСК и ОТК', 'пптттт', 'пилот: сервисные ДЗО, наибольшая доля подрядных бригад'],
+    ['ОКК и ОМГ', '  тттт', ''],
+    ['Все добывающие ДЗО', '    тт', 'ММГ, КБМ, ЭМГ, КТМ и др.'],
+    ['Гейт в KMG AISAP', ' поооо', 'с Q3 2027 обязателен для работ повышенной опасности'],
+  ];
+  const БЛОК = {
+    'п': '<div class="блок пилот">пилот</div>',
+    'т': '<div class="блок тираж">тираж</div>',
+    'о': '<div class="блок тираж">обязателен</div>',
+    ' ': '<div class="блок пусто"></div>',
+  };
+  function экр(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function лента(id, ряды){
+    let h = '<div class="пусто-угол"></div>' + КВАРТАЛЫ.map(к=>'<div class="кв">'+к+'</div>').join('');
+    ряды.forEach(([имя, шаблон, прим])=>{
+      h += '<div class="ряд">'+экр(имя)+(прим?'<small>'+экр(прим)+'</small>':'')+'</div>';
+      for (let i=0;i<6;i++) h += БЛОК[шаблон[i] || ' '];
+    });
+    document.getElementById(id).innerHTML = h;
+  }
+  лента('лента1', ЛЕНТА1);
+  лента('лента2', ЛЕНТА2);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Экран мастера — наряды на смену</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="стиль.css">
+<style>
+  .фильтры{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+  .фильтры .кнопка{padding:10px 18px}
+  .сводка{font-size:var(--текст);margin:0 0 12px;font-weight:500}
+  .сводка b{font-family:var(--моно);font-weight:600}
+  table.таблица td .шкала{width:120px;margin-top:6px}
+  table.таблица td.индекс{white-space:nowrap}
+  table.таблица td .бейдж{margin-left:6px;vertical-align:middle}
+  table.таблица td .подпись{display:block}
+  .панель .шапка-карточки h3{margin:0;font-family:var(--моно);font-size:24px}
+  .панель .индекс-блок{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin:8px 0 20px}
+  .панель .индекс-блок .шкала{height:16px}
+  .панель h4{font-size:17px;margin:20px 0 8px;text-transform:uppercase;letter-spacing:.04em;color:var(--второй);font-weight:600}
+  .панель .факторы li .имя{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+  .панель .фото{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:2px solid var(--линия);border-radius:var(--радиус)}
+  .панель .фото.пройдена{border-color:var(--зелёный);background:var(--зелёный-фон)}
+  .панель .фото.не-пройдена{border-color:var(--красный);background:var(--красный-фон)}
+  .панель .фото .кнопка{padding:8px 14px;font-size:var(--подпись)}
+  .панель ol.мероприятия{margin:0;padding-left:24px}
+  .панель ol.мероприятия li{padding:6px 0}
+  .панель .действия{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;align-items:center}
+  .панель .уведомление{font-size:var(--подпись);color:var(--второй);padding:8px 12px;border:1.5px dashed var(--линия);border-radius:4px;display:none}
+  .панель .уведомление.видно{display:inline-block}
+  .пусто td{text-align:center;color:var(--второй);padding:28px}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html">Обзор</a><a href="смена.html" class="активна">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="подрядчик.html">Подрядчики</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <span class="плашка демо">Демонстрационные данные</span>
+</div></header>
+
+<main class="страница">
+  <div class="заголовок">
+    <div>
+      <h1>Наряды на смену</h1>
+      <div class="подпись">Озенмунайгаз · ПСП (пилот) · смена 08.10.2026, дневная и ночная</div>
+    </div>
+    <span class="плашка">Индекс считается до выдачи наряда</span>
+  </div>
+
+  <div class="фильтры" id="фильтры">
+    <button class="кнопка" data-фильтр="все">Все</button>
+    <button class="кнопка вторая" data-фильтр="к">Красные</button>
+    <button class="кнопка вторая" data-фильтр="ж">Жёлтые</button>
+    <button class="кнопка вторая" data-фильтр="з">Зелёные</button>
+    <button class="кнопка вторая" data-фильтр="подрядные">Подрядные</button>
+  </div>
+
+  <div class="разворот">
+    <div>
+      <p class="сводка" id="сводка"></p>
+      <table class="таблица">
+        <thead>
+          <tr>
+            <th>Светофор</th><th>Наряд</th><th>Вид работ</th><th>Объект</th><th>Бригада</th><th>Начало</th><th class="право">Людей</th><th>Индекс</th>
+          </tr>
+        </thead>
+        <tbody id="строки"></tbody>
+      </table>
+      <p class="подпись" style="margin-top:16px">Индекс — подсказка, не наказание: не входит в KPI премирования, виден бригаде и мастеру. Красный не блокирует наряд: решение принимает служба ПБ.</p>
+    </div>
+
+    <aside class="панель карточка" id="панель"></aside>
+  </div>
+
+  <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</main>
+
+<script src="данные.js"></script>
+<script>
+(function(){
+  const Д = window.ДАННЫЕ;
+  const НАРЯДЫ = Д.НАРЯДЫ; // уже отсортированы по индексу
+  const ПОДПИСЬ_СВЕТА = {з:'Обычный допуск', ж:'Инструктаж', к:'Эскалация'};
+  const КНОПКА = {з:'Выдать наряд', ж:'Выдать после инструктажа', к:'Передать в службу ПБ'};
+  const ФОТО_КЛАСС = {'пройдена':'пройдена', 'не пройдена':'не-пройдена', 'не загружена':'не-загружена'};
+
+  let фильтр = 'все';
+  let выбранный = НАРЯДЫ[0] ? НАРЯДЫ[0].номер : null;
+
+  function экр(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function классФактора(ф){ const д = ф.баллы/ф.макс; return д>=0.66?'к':д>=0.33?'ж':'з'; }
+  function шкала(н){ return '<div class="шкала"><i class="'+н.свет+'" style="width:'+н.индекс+'%"></i></div>'; }
+
+  function отфильтровано(){
+    return НАРЯДЫ.filter(н => фильтр==='все' ? true : фильтр==='подрядные' ? н.подрядная : н.свет===фильтр);
+  }
+
+  function сводка(){
+    const к = НАРЯДЫ.filter(н=>н.свет==='к').length;
+    const ж = НАРЯДЫ.filter(н=>н.свет==='ж').length;
+    const з = НАРЯДЫ.filter(н=>н.свет==='з').length;
+    const п = НАРЯДЫ.filter(н=>н.подрядная).length;
+    document.getElementById('сводка').innerHTML =
+      '<b>'+НАРЯДЫ.length+'</b> нарядов · <b>'+к+'</b> красных · <b>'+ж+'</b> жёлтых · <b>'+з+'</b> зелёных · <b>'+п+'</b> подрядных бригад';
+  }
+
+  function таблица(){
+    const tb = document.getElementById('строки');
+    const список = отфильтровано();
+    if (!список.length){
+      tb.innerHTML = '<tr class="пусто"><td colspan="8">По выбранному фильтру нарядов нет</td></tr>';
+      return;
+    }
+    tb.innerHTML = список.map(н => {
+      const бейджи = (н.подрядная?' <span class="бейдж синий">подрядная</span>':'') + (н.ночь?' <span class="бейдж">ночь</span>':'');
+      return '<tr class="кликабельна'+(н.номер===выбранный?' выбрана':'')+'" data-номер="'+экр(н.номер)+'">'+
+        '<td><span class="свет '+н.свет+'">'+ПОДПИСЬ_СВЕТА[н.свет]+'</span></td>'+
+        '<td class="моно">'+экр(н.номер)+'</td>'+
+        '<td>'+экр(н.вид)+'</td>'+
+        '<td>'+экр(н.псп)+' · '+экр(н.объект)+'</td>'+
+        '<td>'+экр(н.бригада)+бейджи+'</td>'+
+        '<td class="моно">'+экр(н.начало)+'</td>'+
+        '<td class="право моно">'+н.людей+'</td>'+
+        '<td class="индекс"><span class="моно">'+н.индекс+'</span>'+шкала(н)+'</td>'+
+      '</tr>';
+    }).join('');
+    tb.querySelectorAll('tr.кликабельна').forEach(tr => tr.addEventListener('click', () => {
+      выбранный = tr.dataset.номер;
+      таблица(); панель();
+    }));
+  }
+
+  function панель(){
+    const эл = document.getElementById('панель');
+    const н = НАРЯДЫ.find(x=>x.номер===выбранный);
+    if (!н){ эл.innerHTML = '<p class="подпись">Выберите наряд в таблице</p>'; return; }
+    const цвет = {з:'зелёное', ж:'янтарное', к:'красное'}[н.свет];
+    const факторы = н.факторы.map(ф => {
+      const кл = классФактора(ф);
+      return '<li class="'+кл+'"><span class="имя">'+экр(ф.имя)+' <span class="бейдж">'+экр(ф.источник)+'</span></span><span class="вес">+'+ф.баллы+'</span></li>';
+    }).join('');
+    const мероприятия = н.факторы.map(ф=>Д.МЕРОПРИЯТИЯ[ф.код]).filter(Boolean).slice(0,4)
+      .map(м=>'<li>'+экр(м)+'</li>').join('');
+    const фотоКласс = ФОТО_КЛАСС[н.фото] || '';
+    эл.innerHTML =
+      '<div class="шапка-карточки"><h3>'+экр(н.номер)+'</h3><span class="свет '+н.свет+'">'+ПОДПИСЬ_СВЕТА[н.свет]+'</span></div>'+
+      '<div class="подпись">'+экр(н.вид)+' · '+экр(н.псп)+' · '+экр(н.объект)+' · бригада '+экр(н.бригада)+(н.подрядная?' (подрядная)':'')+' · начало '+экр(н.начало)+' · '+н.людей+' чел.</div>'+
+      '<div class="индекс-блок"><div class="число малое '+цвет+'">'+н.индекс+'</div>'+шкала(н)+'</div>'+
+      '<h4>Почему такой индекс</h4>'+
+      (факторы ? '<ul class="факторы">'+факторы+'</ul>' : '<p class="подпись">Факторов риска не выявлено</p>')+
+      '<h4>Фотопроверка места работ</h4>'+
+      '<div class="фото '+фотоКласс+'"><span><b>'+экр(н.фото.charAt(0).toUpperCase()+н.фото.slice(1))+'</b></span>'+
+      '<button class="кнопка вторая" data-демо>Запросить фото</button></div>'+
+      '<h4>ИИ-подсказанные мероприятия</h4>'+
+      (мероприятия ? '<ol class="мероприятия">'+мероприятия+'</ol>' : '<p class="подпись">Дополнительных мероприятий не требуется</p>')+
+      '<div class="действия"><button class="кнопка" data-демо>'+КНОПКА[н.свет]+'</button>'+
+      '<span class="уведомление" id="уведомление">Демонстрация: действие не выполняется</span></div>';
+    эл.querySelectorAll('[data-демо]').forEach(б => б.addEventListener('click', () => {
+      const у = document.getElementById('уведомление');
+      у.classList.add('видно');
+      clearTimeout(у._т); у._т = setTimeout(()=>у.classList.remove('видно'), 2500);
+    }));
+  }
+
+  document.querySelectorAll('#фильтры button').forEach(б => б.addEventListener('click', () => {
+    фильтр = б.dataset.фильтр;
+    document.querySelectorAll('#фильтры button').forEach(x => x.classList.toggle('вторая', x!==б));
+    const список = отфильтровано();
+    if (!список.some(н=>н.номер===выбранный)) выбранный = список.length ? список[0].номер : null;
+    таблица(); панель();
+  }));
+
+  сводка(); таблица(); панель();
+})();
+</script>
+</body>
+</html>

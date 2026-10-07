@@ -1,0 +1,169 @@
+/* KMG-HSE-RISK — единый стиль прототипа. Светлая «бумага», светофор, Plex. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root{
+  --бумага:#F7F6F2;
+  --карточка:#FFFFFF;
+  --чернила:#101828;
+  --второй:#475467;
+  --линия:#D0D5DD;
+  --линия-толстая:#101828;
+  --зелёный:#1B8A4C;
+  --зелёный-фон:#E6F4EC;
+  --янтарь:#D98E04;
+  --янтарь-фон:#FFF4DB;
+  --красный:#C8102E;
+  --красный-фон:#FDE8EB;
+  --сигнал:#FFC72C;
+  --синий:#1D4ED8;
+  --синий-фон:#E8EEFC;
+  --текст:17px;
+  --подпись:15px;
+  --радиус:6px;
+  --шрифт:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --моно:'IBM Plex Mono','Cascadia Mono','Consolas',monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--бумага);color:var(--чернила);font-family:var(--шрифт);font-size:var(--текст);line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--синий);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3{margin:0 0 .4em;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+h1{font-size:44px}
+h2{font-size:30px}
+h3{font-size:22px}
+p{margin:0 0 .8em}
+small,.подпись{font-size:var(--подпись);color:var(--второй)}
+.моно{font-family:var(--моно);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* Шапка с навигацией */
+.шапка{position:sticky;top:0;z-index:20;background:var(--бумага);border-bottom:2px solid var(--линия-толстая)}
+.шапка .внутри{max-width:1760px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:28px}
+.шапка .лого{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px;color:var(--чернила)}
+.шапка .лого .знак{width:34px;height:34px;border:2px solid var(--чернила);border-radius:var(--радиус);display:grid;place-items:center;background:var(--сигнал)}
+.шапка nav{display:flex;gap:6px;flex-wrap:wrap}
+.шапка nav a{padding:8px 14px;border-radius:var(--радиус);color:var(--чернила);font-weight:500;border:2px solid transparent}
+.шапка nav a:hover{text-decoration:none;border-color:var(--линия)}
+.шапка nav a.активна{background:var(--чернила);color:#fff}
+.шапка .демо{margin-left:auto}
+
+/* Плашка «демонстрационные данные» */
+.плашка{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--радиус);font-size:var(--подпись);font-weight:600;background:var(--сигнал);color:var(--чернила);border:2px solid var(--чернила)}
+.плашка::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--чернила)}
+
+/* Ограждающая полоска */
+.полоска{height:10px;background:repeating-linear-gradient(135deg,var(--сигнал) 0 18px,var(--чернила) 18px 36px);border-radius:3px}
+
+/* Контейнер и сетки */
+.страница{max-width:1760px;margin:0 auto;padding:36px 32px 80px}
+.сетка{display:grid;gap:20px}
+.сетка.к2{grid-template-columns:repeat(2,1fr)}
+.сетка.к3{grid-template-columns:repeat(3,1fr)}
+.сетка.к4{grid-template-columns:repeat(4,1fr)}
+.сетка.к7{grid-template-columns:repeat(7,1fr)}
+@media(max-width:1200px){.сетка.к4,.сетка.к7{grid-template-columns:repeat(2,1fr)}.сетка.к3{grid-template-columns:1fr}}
+@media(max-width:800px){.сетка.к2,.сетка.к4,.сетка.к7{grid-template-columns:1fr}h1{font-size:34px}.страница{padding:24px 16px 60px}.шапка .внутри{padding:12px 16px}}
+
+/* Карточка */
+.карточка{background:var(--карточка);border:2px solid var(--линия-толстая);border-radius:var(--радиус);padding:22px 24px}
+.карточка.тонкая{border-color:var(--линия)}
+.карточка h3{margin-bottom:10px}
+.карточка .шапка-карточки{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+
+/* Крупное число */
+.число{font-family:var(--моно);font-size:64px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.число.малое{font-size:40px}
+.число.красное{color:var(--красный)}
+.число.янтарное{color:var(--янтарь)}
+.число.зелёное{color:var(--зелёный)}
+
+/* Светофор */
+.свет{display:inline-flex;align-items:center;gap:10px;padding:6px 14px 6px 10px;border-radius:999px;font-weight:600;font-size:var(--подпись);border:2px solid currentColor;white-space:nowrap}
+.свет::before{content:'';width:14px;height:14px;border-radius:50%;background:currentColor}
+.свет.з{color:var(--зелёный);background:var(--зелёный-фон)}
+.свет.ж{color:var(--янтарь);background:var(--янтарь-фон)}
+.свет.к{color:var(--красный);background:var(--красный-фон)}
+.точка{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:middle}
+.точка.з{background:var(--зелёный)}.точка.ж{background:var(--янтарь)}.точка.к{background:var(--красный)}
+
+/* Шкала индекса */
+.шкала{height:14px;border:2px solid var(--чернила);border-radius:999px;overflow:hidden;background:#fff}
+.шкала i{display:block;height:100%}
+.шкала i.з{background:var(--зелёный)}.шкала i.ж{background:var(--янтарь)}.шкала i.к{background:var(--красный)}
+
+/* Таблица */
+table.таблица{width:100%;border-collapse:collapse;font-size:var(--текст)}
+table.таблица th,table.таблица td{text-align:left;padding:12px 12px;border-bottom:1px solid var(--линия);vertical-align:top}
+table.таблица th{font-size:var(--подпись);text-transform:uppercase;letter-spacing:.04em;color:var(--второй);border-bottom:2px solid var(--чернила)}
+table.таблица tr.кликабельна{cursor:pointer}
+table.таблица tr.кликабельна:hover{background:#FBFAF6}
+table.таблица tr.выбрана{background:var(--янтарь-фон)}
+table.таблица td.право,table.таблица th.право{text-align:right}
+
+/* Теплокарта */
+.тепло{display:grid;gap:4px}
+.тепло .ячейка{padding:10px 8px;border-radius:4px;text-align:center;font-family:var(--моно);font-weight:600;font-size:var(--подпись);border:1px solid rgba(16,24,40,.08)}
+.т0{background:#F2F4F7;color:var(--второй)}
+.т1{background:#E6F4EC;color:#0F5A30}
+.т2{background:#FFF4DB;color:#7A4E00}
+.т3{background:#FFD9A1;color:#5A3800}
+.т4{background:#F7B7C2;color:#7A0A1C}
+.т5{background:#C8102E;color:#fff}
+
+/* Кнопки и ползунки */
+.кнопка{display:inline-block;padding:12px 20px;border-radius:var(--радиус);border:2px solid var(--чернила);background:var(--чернила);color:#fff;font-weight:600;font-size:var(--текст);cursor:pointer}
+.кнопка.вторая{background:#fff;color:var(--чернила)}
+.кнопка:hover{text-decoration:none;opacity:.92}
+input[type=range]{width:100%;accent-color:var(--чернила)}
+.ползунок{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--линия)}
+.ползунок label{font-weight:500}
+.ползунок .значение{font-family:var(--моно);font-weight:600;min-width:140px;text-align:right}
+.ползунок input{grid-column:1/-1}
+.ползунок .подпись{grid-column:1/-1}
+
+/* Бейджи и списки факторов */
+.бейдж{display:inline-block;padding:3px 10px;border-radius:4px;font-size:var(--подпись);font-weight:600;border:1.5px solid var(--линия);background:#fff}
+.бейдж.синий{background:var(--синий-фон);color:var(--синий);border-color:var(--синий)}
+.факторы{list-style:none;margin:0;padding:0}
+.факторы li{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--линия)}
+.факторы li .вес{font-family:var(--моно);font-weight:600}
+.факторы li.к .вес{color:var(--красный)}.факторы li.ж .вес{color:var(--янтарь)}.факторы li.з .вес{color:var(--зелёный)}
+
+/* Боковая панель карточки наряда */
+.разворот{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start}
+@media(max-width:1100px){.разворот{grid-template-columns:1fr}}
+.панель{position:sticky;top:90px}
+
+/* Заголовочный блок страницы */
+.заголовок{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.заголовок .лид{max-width:900px;font-size:20px;color:var(--второй)}
+
+/* Нижний колонтитул */
+.подвал{margin-top:48px;padding-top:18px;border-top:2px solid var(--чернила);font-size:var(--подпись);color:var(--второй);display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between}
+
+/* Схема контура */
+.схема svg{width:100%;height:auto;display:block}
+.схема text{font-family:var(--шрифт);font-size:17px;fill:var(--чернила)}
+.схема .моно{font-family:var(--моно)}
+.схема .подпись{font-size:15px;fill:var(--второй)}
+.схема .рамка{fill:#fff;stroke:var(--чернила);stroke-width:2}
+.схема .рамка.акцент{fill:var(--сигнал)}
+.схема .линия{stroke:var(--чернила);stroke-width:2;fill:none}
+.схема .з{fill:var(--зелёный)}.схема .ж{fill:var(--янтарь)}.схема .к{fill:var(--красный)}
+
+/* Sparkline */
+.искра{width:100%;height:56px;display:block}
+.искра path{fill:none;stroke:var(--чернила);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.искра .зона{fill:var(--сигнал);opacity:.25;stroke:none}
+
+/* Лента времени (дорожная карта) */
+.лента{display:grid;grid-template-columns:220px repeat(6,1fr);gap:6px;align-items:center}
+.лента .кв{font-size:var(--подпись);text-transform:uppercase;letter-spacing:.04em;color:var(--второй);text-align:center;padding:8px 0;border-bottom:2px solid var(--чернила)}
+.лента .ряд{font-weight:600;padding:12px 0}
+.лента .блок{height:44px;border-radius:4px;border:2px solid var(--чернила);display:flex;align-items:center;justify-content:center;font-size:var(--подпись);font-weight:600}
+.лента .блок.пилот{background:var(--сигнал)}
+.лента .блок.тираж{background:var(--зелёный-фон);border-color:var(--зелёный);color:var(--зелёный)}
+.лента .блок.пусто{border:1px dashed var(--линия);background:transparent}
+
+/* Печать */
+@media print{.шапка{position:static}.кнопка{display:none}}

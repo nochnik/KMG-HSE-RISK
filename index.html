@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Индекс риска работ повышенной опасности</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="стиль.css">
+<style>
+  .обложка .полоска{margin-bottom:28px}
+  .обложка h1{max-width:1100px}
+  .обложка .лид{max-width:1000px;font-size:22px;color:var(--второй);margin:0 0 32px}
+  .цифра .число{margin-bottom:12px}
+  .цифра p{margin:0;font-size:var(--текст)}
+  .источники{margin:14px 0 48px}
+  .раздел{margin-top:48px}
+  .раздел p.текст{max-width:1100px;font-size:19px}
+  .схема{margin:20px 0 8px;background:var(--карточка);border:2px solid var(--линия-толстая);border-radius:var(--радиус);padding:18px}
+  .схема .жирный{font-weight:600}
+  .схема .моно-подпись{font-family:var(--моно);font-weight:600;font-size:15px;fill:var(--второй)}
+  .слои h3{display:flex;align-items:center;gap:10px}
+  .слои .номер{font-family:var(--моно);font-size:15px;font-weight:600;padding:2px 8px;border:2px solid var(--чернила);border-radius:4px;background:var(--сигнал)}
+  .ссылки{display:flex;gap:14px;flex-wrap:wrap;margin-top:36px}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html" class="активна">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="подрядчик.html">Подрядчики</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <span class="плашка демо">Демонстрационные данные</span>
+</div></header>
+
+<main class="страница обложка">
+  <div class="полоска"></div>
+  <h1>Индекс риска работ повышенной опасности</h1>
+  <p class="лид">ИИ-оценка наряда-допуска и бригады до начала работ на опережающих индикаторах систем, которые группа КМГ уже внедряет. Для собственных и подрядных бригад.</p>
+
+  <div class="сетка к3">
+    <div class="карточка цифра">
+      <div class="число красное">10,38</div>
+      <p>FAR подрядных организаций в 2025 году при ориентире IOGP 0,84</p>
+    </div>
+    <div class="карточка цифра">
+      <div class="число янтарное">1 из 3</div>
+      <p>несчастных случаев в группе происходит на работах повышенной опасности</p>
+    </div>
+    <div class="карточка цифра">
+      <div class="число красное">3</div>
+      <p>смертельных случая в ДЗО за первое полугодие 2026</p>
+    </div>
+  </div>
+  <p class="подпись источники">Источники: годовой отчёт АО НК «КазМунайГаз» за 2025 год; заявление заместителя Председателя Правления на заседании Правительства 02.06.2026; сообщение компании за первое полугодие 2026.</p>
+
+  <section class="раздел">
+    <h2>Четыре системы, четыре контура, ноль прогноза</h2>
+    <p class="текст">ЭНД, TUMAR, «Управление поездками» и «Қорғау» фиксируют нарушение в момент, когда оно происходит, — каждая в своём контуре. Никто из них не отвечает мастеру на главный вопрос смены: какая работа и какая бригада сегодня в зоне повышенного риска.</p>
+  </section>
+
+  <section class="раздел">
+    <h2>Как работает контур</h2>
+    <div class="схема">
+      <svg viewBox="0 0 1600 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема контура: шесть источников данных, индекс риска наряда и бригады, три исхода светофора, обратная связь из актов расследования">
+        <defs>
+          <marker id="стрелка" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#101828"/>
+          </marker>
+        </defs>
+
+        <!-- Источники -->
+        <g>
+          <rect class="рамка" x="20" y="20" width="440" height="62" rx="6"/>
+          <text x="40" y="46" class="жирный">ЭНД</text>
+          <text x="40" y="70" class="подпись">наряды и инструктажи</text>
+
+          <rect class="рамка" x="20" y="96" width="440" height="62" rx="6"/>
+          <text x="40" y="122" class="жирный">TUMAR</text>
+          <text x="40" y="146" class="подпись">нарушения СИЗ и опасной зоны</text>
+
+          <rect class="рамка" x="20" y="172" width="440" height="62" rx="6"/>
+          <text x="40" y="198" class="жирный">Управление поездками</text>
+          <text x="40" y="222" class="подпись">скорость и режим водителей</text>
+
+          <rect class="рамка" x="20" y="248" width="440" height="62" rx="6"/>
+          <text x="40" y="274" class="жирный">Қорғау</text>
+          <text x="40" y="298" class="подпись">сообщения об опасности</text>
+
+          <rect class="рамка" x="20" y="324" width="440" height="62" rx="6"/>
+          <text x="40" y="350" class="жирный">Реестр инцидентов</text>
+          <text x="40" y="374" class="подпись">история объекта</text>
+
+          <rect class="рамка" x="20" y="400" width="440" height="62" rx="6"/>
+          <text x="40" y="426" class="жирный">Фото места работ</text>
+          <text x="40" y="450" class="подпись">телефон мастера</text>
+        </g>
+
+        <!-- Стрелки источники → индекс -->
+        <g>
+          <path class="линия" d="M460 51 H540 Q580 51 590 90 L620 220" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M460 127 H540 Q575 127 588 160 L612 230" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M460 203 H540 Q580 203 600 240 L612 262" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M460 279 H540 Q580 279 600 266 L612 258" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M460 355 H540 Q575 355 588 322 L612 262" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M460 431 H540 Q580 431 590 392 L620 270" marker-end="url(#стрелка)"/>
+        </g>
+
+        <!-- Центральная рамка -->
+        <g>
+          <rect class="рамка акцент" x="620" y="150" width="400" height="190" rx="6"/>
+          <text x="820" y="200" text-anchor="middle" style="font-size:24px;font-weight:700">Индекс риска</text>
+          <text x="820" y="232" text-anchor="middle" style="font-size:24px;font-weight:700">наряда и бригады</text>
+          <text x="820" y="266" text-anchor="middle" class="моно-подпись" style="fill:#101828">АСДЦ</text>
+          <text x="820" y="310" text-anchor="middle" class="подпись">опережающие индикаторы, не прогноз НС</text>
+        </g>
+
+        <!-- Стрелки индекс → светофор -->
+        <g>
+          <path class="линия" d="M1020 215 Q1060 215 1080 150 T1140 100" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M1020 245 H1140" marker-end="url(#стрелка)"/>
+          <path class="линия" d="M1020 275 Q1060 275 1080 340 T1140 390" marker-end="url(#стрелка)"/>
+        </g>
+
+        <!-- Три выхода -->
+        <g>
+          <rect class="рамка" x="1150" y="40" width="430" height="112" rx="6"/>
+          <circle class="з" cx="1184" cy="96" r="14"/>
+          <text x="1212" y="82" class="жирный">Зелёный</text>
+          <text x="1212" y="110" class="подпись">обычный допуск</text>
+
+          <rect class="рамка" x="1150" y="178" width="430" height="136" rx="6"/>
+          <circle class="ж" cx="1184" cy="246" r="14"/>
+          <text x="1212" y="220" class="жирный">Жёлтый</text>
+          <text x="1212" y="248" class="подпись">целевой инструктаж, ИИ-мероприятия,</text>
+          <text x="1212" y="272" class="подпись">контроль мастера</text>
+
+          <rect class="рамка" x="1150" y="340" width="430" height="136" rx="6"/>
+          <circle class="к" cx="1184" cy="408" r="14"/>
+          <text x="1212" y="382" class="жирный">Красный</text>
+          <text x="1212" y="410" class="подпись">эскалация в службу ПБ, дополнительные барьеры.</text>
+          <text x="1212" y="434" class="подпись" style="fill:#101828;font-weight:600">Решение принимает человек</text>
+        </g>
+
+        <!-- Обратная связь -->
+        <g>
+          <path class="линия" stroke-dasharray="8 6" d="M1365 476 V540 H820 V352" marker-end="url(#стрелка)"/>
+          <text x="1092" y="575" text-anchor="middle" class="подпись">акты расследования → извлечённые уроки → дообучение</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="раздел слои">
+    <h2>Три слоя</h2>
+    <div class="сетка к3">
+      <div class="карточка">
+        <h3><span class="номер">1</span>Индекс риска</h3>
+        <p>Ядро. Оценка каждого наряда-допуска и бригады до начала работ по данным систем, которые уже внедрены: ЭНД, TUMAR, «Управление поездками», «Қорғау», реестр инцидентов.</p>
+      </div>
+      <div class="карточка">
+        <h3><span class="номер">2</span>Фотопроверка места работ</h3>
+        <p>Сигнал там, где камер нет: НПЗ, трубопроводы, транспорт. Мастер снимает место работ телефоном, модель проверяет ограждения, знаки, СИЗ и состояние площадки.</p>
+      </div>
+      <div class="карточка">
+        <h3><span class="номер">3</span>Извлечённые уроки</h3>
+        <p>ИИ читает акты расследования и наполняет реестр инцидентов: причины, барьеры, уроки. Это план ДПБ на 2026 год, индекс получает историю объекта и вида работ.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ссылки">
+    <a class="кнопка" href="смена.html">Экран мастера →</a>
+    <a class="кнопка" href="карта.html">Экран ДПБ →</a>
+    <a class="кнопка вторая" href="эффект.html">Калькулятор эффекта →</a>
+    <a class="кнопка вторая" href="подрядчик.html">Паспорт подрядчика →</a>
+  </div>
+
+  <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</main>
+</body>
+</html>

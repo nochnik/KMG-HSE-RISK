@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Экран ДПБ — карта риска по ДЗО</title>
+<link rel="stylesheet" href="стиль.css">
+<style>
+  /* Страница «Карта риска по ДЗО» — локальные стили */
+  .дзо{cursor:pointer;display:flex;flex-direction:column;gap:10px;padding:18px 20px;user-select:none}
+  .дзо:hover{background:#FBFAF6}
+  .дзо.выбрана{outline:4px solid var(--сигнал);outline-offset:-2px}
+  .дзо .код{font-size:30px;line-height:1}
+  .дзо .имя{font-weight:500;font-size:var(--текст);min-height:2.6em;line-height:1.3}
+  .дзо .бейджи{display:flex;flex-wrap:wrap;gap:6px}
+  .дзо .шапка-карточки{margin-bottom:0}
+  .дзо .свет{font-size:var(--текст)}
+  .дзо .искра path{vector-effect:non-scaling-stroke}
+  .дзо .счёт{font-size:var(--подпись);color:var(--второй)}
+  .дзо .счёт b{color:var(--чернила);font-family:var(--моно);font-weight:600}
+
+  .тепло.объекты{grid-template-columns:minmax(170px,1.3fr) repeat(6,1fr) 96px;margin-top:8px}
+  .тепло .заг{font-size:var(--подпись);color:var(--второй);text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:8px 4px;border-bottom:2px solid var(--чернила);align-self:end}
+  .тепло .заг.лево{text-align:left}
+  .тепло .объект{padding:10px 8px;font-weight:500;font-size:var(--текст);display:flex;align-items:center}
+  .тепло .итог{padding:10px 8px;text-align:right;font-size:20px;display:flex;align-items:center;justify-content:flex-end;gap:8px}
+  .тепло .итог.к{color:var(--красный)}.тепло .итог.ж{color:var(--янтарь)}.тепло .итог.з{color:var(--зелёный)}
+  .легенда{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:14px;font-size:var(--подпись);color:var(--второй)}
+  .легенда span{display:inline-flex;align-items:center;gap:6px}
+  .легенда i{width:18px;height:18px;border-radius:4px;border:1px solid rgba(16,24,40,.12);display:inline-block}
+
+  .справа{display:grid;gap:20px}
+  .уроки{list-style:none;margin:0;padding:0}
+  .уроки li{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;padding:12px 0;border-bottom:1px solid var(--линия)}
+  .уроки li:last-child{border-bottom:none}
+  .уроки .дата{font-size:var(--подпись)}
+  .уроки .где{justify-self:start}
+  .уроки .суть{grid-column:1/-1;font-size:var(--текст);line-height:1.4}
+  .действия{list-style:none;margin:0;padding:0}
+  .действия li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--линия)}
+  .действия li:last-child{border-bottom:none}
+  .действия .точка{margin-top:8px}
+  .раздел-заголовок{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:28px 0 12px}
+  .раздел-заголовок h2{margin:0}
+  .полоска{margin:0 0 24px}
+</style>
+</head>
+<body>
+<header class="шапка"><div class="внутри">
+ <a class="лого" href="index.html"><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
+ <nav><a href="index.html">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html" class="активна">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="подрядчик.html">Подрядчики</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <span class="плашка демо">Демонстрационные данные</span>
+</div></header>
+
+<main class="страница">
+  <div class="заголовок">
+    <div>
+      <h1>Карта риска по ДЗО</h1>
+      <p class="подпись">Департамент производственной безопасности · 08.10.2026 · 14 дней</p>
+    </div>
+    <p class="лид">Индекс каждого ДЗО — среднее по объектам за смену. Клик по карточке раскрывает объекты, факторы и извлечённые уроки.</p>
+  </div>
+  <div class="полоска"></div>
+
+  <section class="сетка к7" id="дзо"></section>
+
+  <div class="раздел-заголовок">
+    <h2 id="заголовок-разворота">Объекты и факторы</h2>
+    <span class="подпись">Ячейка — уровень сигнала по фактору за 14 дней: 0 — нет, 5 — критично</span>
+  </div>
+
+  <section class="разворот">
+    <div class="карточка">
+      <h3 id="заголовок-тепла">Объекты и факторы</h3>
+      <div class="тепло объекты" id="тепло"></div>
+      <div class="легенда">
+        <span><i class="т0"></i>0 — нет сигналов</span>
+        <span><i class="т1"></i>1</span>
+        <span><i class="т2"></i>2</span>
+        <span><i class="т3"></i>3</span>
+        <span><i class="т4"></i>4</span>
+        <span><i class="т5"></i>5 — критично</span>
+        <span>· последняя колонка — индекс объекта</span>
+      </div>
+    </div>
+
+    <aside class="справа">
+      <div class="карточка">
+        <div class="шапка-карточки"><h3 style="margin:0">Извлечённые уроки за 90 дней</h3><span class="бейдж">из актов расследования</span></div>
+        <ul class="уроки" id="уроки"></ul>
+      </div>
+      <div class="карточка тонкая">
+        <h3>Что ДПБ делает с картой</h3>
+        <ul class="действия">
+          <li><span class="точка к"></span><span><b>Красные объекты</b> — выезд службы ПБ ДЗО на неделе.</span></li>
+          <li><span class="точка ж"></span><span><b>Жёлтые</b> — целевые инструктажи по факторам.</span></li>
+          <li><span class="точка з"></span><span><b>Уроки</b> — рассылка на похожие объекты и в реестр инцидентов (план 2026: PSM, MOC, реестры рисков и инцидентов).</span></li>
+        </ul>
+      </div>
+    </aside>
+  </section>
+
+  <p class="подпись" style="margin-top:28px">Индекс ДЗО — среднее по объектам за смену. Источники: ЭНД, TUMAR, «Управление поездками», «Қорғау», реестр инцидентов, фотопроверка.</p>
+
+  <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
+</main>
+
+<script src="данные.js"></script>
+<script>
+(function(){
+  const Д = window.ДАННЫЕ;
+  const ОБЪЕКТЫ = Д.ОБЪЕКТЫ;
+  const ФАКТОРЫ = Д.ФАКТОРЫ.slice(0,6);
+  const КОРОТКО = ['СИЗ','Опасная зона','Скорость','Қорғау','Инструктажи','История'];
+  const ИМЯ_СВЕТА = {к:'красный', ж:'жёлтый', з:'зелёный'};
+  let выбран = (ОБЪЕКТЫ.find(д=>д.пилот) || ОБЪЕКТЫ[0]).код;
+
+  function экр(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  // Sparkline тренда 14 дней: линия + зона под ней. Шкала 0..100.
+  function искра(тренд){
+    const w=160, h=56, p=4, n=тренд.length;
+    const x=i=>p+i*(w-2*p)/(n-1);
+    const y=v=>h-p-(v/100)*(h-2*p);
+    const pts=тренд.map((v,i)=>x(i).toFixed(1)+' '+y(v).toFixed(1));
+    const линия='M'+pts.join(' L');
+    const зона=линия+' L'+x(n-1).toFixed(1)+' '+(h-p)+' L'+x(0).toFixed(1)+' '+(h-p)+' Z';
+    return '<svg class="искра" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true">'+
+      '<path class="зона" d="'+зона+'"/><path d="'+линия+'"/></svg>';
+  }
+
+  function карточка(д){
+    const бейджи = д.системы.map(s=>'<span class="бейдж">'+экр(s)+'</span>').join('') +
+      (д.пилот ? '<span class="бейдж синий">пилот</span>' : '');
+    return '<div class="карточка дзо'+(д.код===выбран?' выбрана':'')+'" data-код="'+д.код+'" role="button" tabindex="0" '+
+      'aria-label="'+экр(д.имя)+', индекс '+д.индекс+', '+ИМЯ_СВЕТА[д.свет]+'">'+
+      '<div class="шапка-карточки"><span class="моно код">'+д.код+'</span><span class="свет '+д.свет+'">'+д.индекс+'</span></div>'+
+      '<div class="имя">'+экр(д.имя)+'</div>'+
+      искра(д.тренд)+
+      '<div class="счёт">нарядов <b>'+д.нарядов+'</b> · красных <b>'+д.красных+'</b> · жёлтых <b>'+д.жёлтых+'</b></div>'+
+      '<div class="бейджи">'+бейджи+'</div>'+
+      '</div>';
+  }
+
+  function рисоватьКарточки(){
+    document.getElementById('дзо').innerHTML = ОБЪЕКТЫ.map(карточка).join('');
+  }
+
+  function рисоватьТепло(){
+    const д = ОБЪЕКТЫ.find(x=>x.код===выбран);
+    document.getElementById('заголовок-тепла').textContent = 'Объекты и факторы · '+д.имя;
+    document.getElementById('заголовок-разворота').textContent = д.код+' · '+д.имя+' · индекс '+д.индекс;
+    let h = '<div class="заг лево">Объект</div>' +
+      КОРОТКО.map((к,i)=>'<div class="заг" title="'+экр(ФАКТОРЫ[i].имя)+'">'+к+'</div>').join('') +
+      '<div class="заг" style="text-align:right">Индекс</div>';
+    д.объекты.forEach(о=>{
+      h += '<div class="объект">'+экр(о.имя)+'</div>';
+      о.ячейки.forEach((v,i)=>{ h += '<div class="ячейка т'+v+'" title="'+экр(ФАКТОРЫ[i].имя)+': '+v+'">'+v+'</div>'; });
+      const с = Д.свет(о.индекс);
+      h += '<div class="итог моно '+с+'"><span class="точка '+с+'"></span>'+о.индекс+'</div>';
+    });
+    document.getElementById('тепло').innerHTML = h;
+  }
+
+  function рисоватьУроки(){
+    document.getElementById('уроки').innerHTML = Д.УРОКИ.map(у=>{
+      const [г,м,д] = у.дата.split('-');
+      return '<li><span class="моно дата">'+д+'.'+м+'.'+г+'</span><span class="бейдж где">'+экр(у.где)+'</span><span class="суть">'+экр(у.суть)+'</span></li>';
+    }).join('');
+  }
+
+  function выбрать(код){
+    if (!ОБЪЕКТЫ.some(x=>x.код===код)) return;
+    выбран = код;
+    document.querySelectorAll('.дзо').forEach(el=>el.classList.toggle('выбрана', el.dataset.код===код));
+    рисоватьТепло();
+  }
+
+  document.getElementById('дзо').addEventListener('click', e=>{
+    const el = e.target.closest('.дзо'); if (el) выбрать(el.dataset.код);
+  });
+  document.getElementById('дзо').addEventListener('keydown', e=>{
+    if (e.key!=='Enter' && e.key!==' ') return;
+    const el = e.target.closest('.дзо'); if (el){ e.preventDefault(); выбрать(el.dataset.код); }
+  });
+
+  рисоватьКарточки();
+  рисоватьТепло();
+  рисоватьУроки();
+})();
+</script>
+</body>
+</html>

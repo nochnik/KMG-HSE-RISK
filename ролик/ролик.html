@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Светофор наряда · индекс риска</title>
+<!-- Шрифты — локально (vendor/), без интернета. В наборе нет казахских Қ/ғ и знаков ≈ → —
+     для них в стеках указан системный запасной шрифт (Segoe UI), он одинаков на каждом кадре. -->
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<style>
+/* =====================================================================
+   Ролик «Светофор наряда» (индекс риска работ повышенной опасности).
+   Каркас — шаблон/ролик.html: всё в кадре — HTML/CSS/SVG, время — аргумент renderAt(t).
+   ===================================================================== */
+:root{ --ui-bg:#141414; --ui-panel:#1b1b1b; --ui-fg:#e9e9e9; --ui-dim:#8b8b8b; --ui-line:#2e2e2e;
+  /* палитра прототипа KMG-HSE-RISK (стиль.css) */
+  --бумага:#F5F9FC; --чернила:#231F20; --второй:#55606B; --линия:#CFDCE6;
+  --кмг:#02AEF0; --кмг-тёмный:#0089C4; --кмг-свет:#90D6F7; --кмг-фон:#E6F6FD;
+  --зелёный:#1B8A4C; --зелёный-фон:#E6F4EC; --янтарь:#D98E04; --янтарь-фон:#FFF4DB; --красный:#C8102E; --красный-фон:#FDE8EB;
+  --т:"Onest","Segoe UI",sans-serif; --з:"Inter Tight","Segoe UI",sans-serif; --п:"Jost","Segoe UI",sans-serif; --м:"JetBrains Mono","Segoe UI",monospace; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ui-bg);color:var(--ui-fg);font:13px/1.45 "JetBrains Mono",ui-monospace,monospace;overflow:hidden}
+
+/* ---------- Плеер (в рендере скрыт) ---------- */
+.app{display:flex;flex-direction:column;height:100%;gap:14px;padding:16px;align-items:center;justify-content:center}
+.stage-wrap{position:relative;flex:none;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--ui-line),0 24px 70px rgba(0,0,0,.55)}
+.panel{width:min(1200px,100%);flex:none;background:var(--ui-panel);border:1px solid var(--ui-line);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:auto 1fr;gap:10px 18px;align-items:center}
+.time{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.time small{font-size:12px;color:var(--ui-dim);font-weight:500}
+input[type=range]{width:100%;accent-color:#fff}
+.btns,.chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;color:var(--ui-fg);background:#262626;border:1px solid #3a3a3a;border-radius:6px;padding:6px 10px;cursor:pointer}
+button.on{background:var(--ui-fg);color:#111}
+.chips span{padding:4px 8px;border:1px solid #333;border-radius:5px;cursor:pointer;color:var(--ui-dim)}
+.chips span.on{color:#fff;border-color:#888}
+body.render .app{display:block;padding:0}
+body.render .panel{display:none}
+body.render .stage-wrap{border-radius:0;box-shadow:none}
+
+/* ---------- Сцена 1920×1080 ---------- */
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#000;color:var(--чернила);font-family:var(--т)}
+#fx{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;z-index:29}
+.item{position:absolute;inset:0;display:none;overflow:hidden;background:var(--bg)}  /* фон под уходящей (уменьшенной) сценой — без чёрной рамки */
+.item.on{display:block}
+.world{position:absolute;inset:0;background:var(--bg);perspective:2600px;perspective-origin:50% 45%}
+.rig{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%}
+/* подпись сцены внизу и метка «02 / 08 · …» сверху — общие для всех сцен */
+#tag{position:absolute;left:110px;bottom:56px;z-index:35;display:flex;align-items:center;gap:20px;color:#231F20}
+#tag i{width:8px;height:42px;border-radius:3px;background:#02AEF0}
+#tag b{font:700 36px var(--п);letter-spacing:-.005em}
+#метка{position:absolute;left:110px;top:54px;z-index:35;font:500 18px var(--м);letter-spacing:.12em;text-transform:uppercase}
+.лого-угол{position:absolute;right:90px;top:46px;height:40px}
+
+/* ---------- UI-кит: окна и элементы прототипа (белые окна с рамкой #231F20) ---------- */
+.abs{position:absolute}
+.win{position:absolute;border-radius:12px;overflow:hidden;background:#fff;color:var(--чернила);border:2px solid var(--чернила);box-shadow:0 34px 70px rgba(9,46,80,.14)}
+.wbar{height:54px;display:flex;align-items:center;gap:12px;padding:0 20px;font:600 20px var(--т);border-bottom:2px solid var(--линия);white-space:nowrap}
+.wbar i{flex:none;width:26px;height:26px;border-radius:6px;background:var(--кмг-свет);border:2px solid var(--чернила)}
+.wbar .sp{flex:1}
+.плашка{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:6px;font:600 15px var(--т);background:var(--кмг-фон);color:var(--кмг-тёмный);border:2px solid var(--кмг);white-space:nowrap}
+.плашка::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--кмг)}
+.card{position:absolute;border-radius:12px;padding:24px 28px;background:#fff;color:var(--чернила);border:2px solid var(--чернила);box-shadow:0 34px 70px rgba(9,46,80,.16)}
+.k-lbl{font:700 16px var(--п);letter-spacing:.1em;text-transform:uppercase;color:var(--второй)}
+.k-val{font:900 64px/1 var(--з);letter-spacing:-.02em}
+.chip{display:inline-flex;align-items:center;gap:9px;padding:4px 14px 4px 10px;border-radius:999px;font:600 17px var(--т);border:2px solid currentColor;white-space:nowrap}
+.chip::before{content:'';width:13px;height:13px;border-radius:50%;background:currentColor}
+.chip.к{color:var(--красный);background:var(--красный-фон)} .chip.ж{color:var(--янтарь);background:var(--янтарь-фон)}
+.chip.з{color:var(--зелёный);background:var(--зелёный-фон)} .chip.с{color:var(--кмг-тёмный);background:var(--кмг-фон)}
+.ист{display:inline-block;padding:2px 9px;border:1.5px solid var(--линия);border-radius:5px;font:600 15px var(--т);color:var(--чернила);background:#fff;white-space:nowrap}
+.подр{display:inline-block;padding:1px 8px;border:1.5px solid var(--кмг);border-radius:5px;font:600 15px var(--т);color:var(--кмг-тёмный);background:var(--кмг-фон)}
+.полоса{position:relative;height:16px;border:2px solid var(--чернила);border-radius:9px;overflow:hidden;background:#fff}
+.полоса i{position:absolute;left:0;top:0;bottom:0;border-radius:0 6px 6px 0}
+.событие{position:absolute;right:16px;top:68px;padding:6px 12px;border-radius:6px;background:var(--красный);color:#fff;font:700 16px var(--м);letter-spacing:.06em;white-space:nowrap}
+.кн{display:flex;align-items:center;justify-content:center;height:52px;border-radius:7px;border:2px solid var(--кмг);color:var(--кмг-тёмный);font:600 18px var(--т);background:#fff;white-space:nowrap}
+.кн.гл{background:var(--кмг);color:#fff}
+/* интро и эффект: крупные числа */
+.н-блок{position:absolute;transform-origin:0 0}
+.н-число{font:900 260px/.95 var(--з);letter-spacing:-.03em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.н-подп{font:700 44px/1.2 var(--п);color:#dfeaf3;margin-top:44px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="stage-wrap" id="wrap">
+    <div id="stage">
+      <div id="layer"></div>
+      <canvas id="fx" width="1920" height="1080"></canvas>
+      <div id="метка"></div>
+      <div id="tag"><i></i><b id="tagN"></b></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="time"><span id="tc">000.00</span> <small>/ <span id="td"></span> c · кадр <span id="fc">0</span></small></div>
+    <input type="range" id="scrub" min="0" step="0.001" value="0" aria-label="Время">
+    <div class="btns">
+      <button id="play">▶ Play</button><button id="restart">↺ Сначала</button><button id="rate">1×</button>
+      <span style="align-self:center;color:var(--ui-dim)">Пробел · ←/→ кадр · Shift+←/→ 1 c</span>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<script type="module">
+/* ---------- Математика времени ---------- */
+const E = {
+  outExpo: t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t), outCubic: t => 1 - Math.pow(1 - t, 3), inCubic: t => t * t * t,
+  inOutCubic: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, inOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2,
+  outBack: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+};
+const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const prog = (t, a, b) => clamp01((t - a) / (b - a));
+const lerp = (a, b, p) => a + (b - a) * p;
+const typed = (s, p) => s.slice(0, Math.round(s.length * clamp01(p)));
+const счёт = (v, знаков = 0) => v.toFixed(знаков).replace('.', ',');
+const ЦВ = { к: '#C8102E', ж: '#D98E04', з: '#1B8A4C' };
+const светофор = v => v >= 60 ? 'к' : v >= 30 ? 'ж' : 'з';           // пороги индекса: 60+ эскалация, 30+ инструктаж
+
+/* =====================================================================
+   ТАЙМЛАЙН. Длительности подобраны так, что каждая смена сцены после интро
+   попадает на начало такта музыки (120 BPM, такт 2 c, сетка от 7 c).
+   ===================================================================== */
+const FPS = 30, W = 1920, H = 1080, ПЕРЕХОД = .7;
+const СЦЕНЫ = [
+  { id: 'интро',   длит: 7,  имя: 'Цифры',            подпись: '' },
+  { id: 'контуры', длит: 10, имя: 'Контуры сегодня',  подпись: 'Четыре системы фиксируют нарушение, когда оно уже случилось' },
+  { id: 'индекс',  длит: 10, имя: 'Индекс риска',     подпись: 'Индекс сводит их сигналы в одну оценку — до начала работ' },
+  { id: 'мастер',  длит: 10, имя: 'Экран мастера',    подпись: 'Решение принимает человек' },
+  { id: 'фото',    длит: 8,  имя: 'Фотопроверка',     подпись: 'Фотопроверка: сигнал там, где камер нет' },
+  { id: 'дпб',     длит: 8,  имя: 'Экран ДПБ',        подпись: 'Служба ПБ видит своё ДЗО, ДПБ — сводку по группе' },
+  { id: 'эффект',  длит: 10, имя: 'Эффект',           подпись: '* оценка автора, параметры открыты в прототипе' },
+  { id: 'финал',   длит: 7,  имя: 'Финал',            подпись: '' }
+];
+let т = 0; СЦЕНЫ.forEach((с, i) => { с.t0 = т; с.t1 = т + с.длит + (i < СЦЕНЫ.length - 1 ? ПЕРЕХОД : 0); с.i = i; т += с.длит; });
+const DUR = т;
+
+/* Миры: светлая «бумага» КМГ и тёмный мир для интро и эффекта */
+const ТЁМНЫЙ = 'radial-gradient(circle,rgba(144,214,247,.12) 1.6px,transparent 2.4px) 0 0/48px 48px,radial-gradient(ellipse at 50% 45%,#0b2a44,#04101c 78%)';
+const СВЕТЛЫЙ = 'linear-gradient(rgba(2,174,240,.06) 1px,transparent 1px) 0 0/60px 60px,linear-gradient(90deg,rgba(2,174,240,.06) 1px,transparent 1px) 0 0/60px 60px,#F5F9FC';
+const МИРЫ = {
+  интро:   { bg: ТЁМНЫЙ,  acc: '#02AEF0', tag: '#e8f1f8', метка: '#90D6F7' },
+  контуры: { bg: СВЕТЛЫЙ, acc: '#02AEF0', tag: '#231F20', метка: '#55606B' },
+  индекс:  { bg: СВЕТЛЫЙ, acc: '#02AEF0', tag: '#231F20', метка: '#55606B' },
+  мастер:  { bg: СВЕТЛЫЙ, acc: '#02AEF0', tag: '#231F20', метка: '#55606B' },
+  фото:    { bg: СВЕТЛЫЙ, acc: '#02AEF0', tag: '#231F20', метка: '#55606B' },
+  дпб:     { bg: СВЕТЛЫЙ, acc: '#02AEF0', tag: '#231F20', метка: '#55606B' },
+  эффект:  { bg: ТЁМНЫЙ,  acc: '#02AEF0', tag: '#e8f1f8', метка: '#90D6F7' },
+  финал:   { bg: СВЕТЛЫЙ, acc: '#02AEF0', tag: '#231F20', метка: '#55606B' }
+};
+
+/* ---------- Данные макетов (иллюстрация, обезличено) ---------- */
+const ЦИФРЫ = [
+  { ч: '10,38',  цв: 'var(--красный)', п: 'FAR подрядных организаций, 2025' },
+  { ч: '1 из 3', цв: 'var(--янтарь)',  п: 'несчастных случаев — на работах повышенной опасности' },
+  { ч: '3',      цв: 'var(--красный)', п: 'смертельных случая за полгода 2026' }
+];
+const ФАКТОРЫ = [
+  ['Заходы в опасную зону при СПО', 'TUMAR', 23], ['Нарушения СИЗ за 7 смен', 'TUMAR', 19],
+  ['Инциденты на объекте за 24 мес', 'Реестр', 19], ['Фотопроверка не пройдена', 'Фото', 15], ['Незакрытые Қорғау', 'Қорғау', 11]
+];
+const НАРЯДЫ = [
+  ['к', 'НД-3321', 'Работы на высоте', 'ПСП-5', 'КРС-02', 0, '08:00', 87], ['к', 'НД-2527', 'СПО', 'ПСП-2', 'КРС-06', 1, '08:00', 85],
+  ['к', 'НД-2598', 'ПРС скважины', 'ПСП-13', 'ПРС-11', 0, '08:30', 62], ['к', 'НД-2986', 'Работы на высоте', 'ПСП-7', 'КРС-04', 0, '08:30', 62],
+  ['ж', 'НД-3356', 'Газоопасные работы', 'ПСП-3', 'ПРС-17', 1, '08:30', 58], ['ж', 'НД-2640', 'КРС', 'ПСП-2', 'ПРС-12', 1, '08:00', 57],
+  ['ж', 'НД-2794', 'ПРС', 'ПСП-8', 'ЭТБ-15', 0, '08:30', 55]
+];
+const СВЕТ_ИМЯ = { к: 'Эскалация', ж: 'Инструктаж', з: 'Допуск' };
+const МЕРЫ = ['1. Разметить опасную зону при СПО, назначить наблюдающего',
+  '2. Целевой инструктаж по СИЗ с разбором кадров бригады', '3. Повторить фотопроверку места работ перед допуском'];
+const ДЗО = [['ОМГ', 59, 151, 5, 23, ['ЭНД', 'TUMAR', 'Поездки', 'Қорғау']], ['ММГ', 46, 109, 2, 12, ['ЭНД', 'Поездки', 'Қорғау']],
+  ['КБМ', 72, 86, 3, 15, ['ЭНД', 'TUMAR', 'Поездки']], ['ЭМГ', 63, 96, 2, 16, ['Поездки', 'Қорғау']],
+  ['ОСК', 62, 126, 3, 20, ['TUMAR', 'Поездки', 'Қорғау']], ['ОМС', 56, 111, 4, 12, ['TUMAR', 'Поездки']], ['ОТК', 62, 87, 2, 14, ['Поездки', 'Қорғау']]];
+const ТЕПЛО = [['ПСП-1', [4, 2, 0, 5, 5, 3], 85], ['ПСП-8', [2, 2, 0, 2, 3, 4], 63], ['ПСП-16', [0, 5, 4, 2, 1, 0], 61], ['ПСП-15', [3, 4, 3, 0, 2, 1], 58]];
+const ЯЧЕЙКА = ['#EEF2F5', '#E6F4EC', '#FFF4DB', '#FDD9A0', '#F6B8C2', '#C8102E'];
+// sparkline ДЗО: 14 точек, детерминированно от номера карточки; в конце — всплеск у красных
+const искра = (k, v) => Array.from({ length: 14 }, (_, j) => 28 + 7 * Math.sin(j * .9 + k * 1.7) + 4 * Math.sin(j * 2.3 + k) + (j === 13 && v >= 60 ? 16 : 0));
+const путьИскры = (k, v, w, h) => искра(k, v).map((y, j) => `${j ? 'L' : 'M'}${(j * w / 13).toFixed(1)},${(h - y * h / 60).toFixed(1)}`).join(' ');
+
+const угол = `<img class="лого-угол" src="assets/лого_кмг.png" alt="">`;
+const ПОЛОЖЕНИЕ = [100, 550, 1000, 1450];        // окна четырёх систем в сцене «контуры»
+
+/* окна четырёх систем — одна разметка: в «контурах» крупно, в «индексе» мелко по углам */
+const окноЭНД = (мал) => `<div class="wbar"><i></i>${мал ? 'ЭНД' : 'ЭНД · наряды'}</div>` + (мал
+  ? `<div class="abs" style="left:20px;top:74px"><div style="font:700 30px var(--м)">НД-3321</div><div style="font:600 18px var(--т);margin-top:6px;color:var(--второй)">наряд выдан · 07:52</div></div>`
+  : `<div class="событие">СОБЫТИЕ 07:52</div>
+     <div class="abs" style="left:24px;right:24px;top:130px"><div class="k-lbl">Наряд-допуск</div>
+       <div style="font:700 46px var(--м);margin-top:8px">НД-3321</div>
+       <div style="font:600 22px/1.3 var(--т);margin-top:16px">Работы на высоте — эстакада</div>
+       <div style="font:500 18px var(--т);color:var(--второй);margin-top:8px">ПСП-5 · бригада КРС-02 · 7 чел.</div>
+       <div style="margin-top:40px;display:flex;align-items:center;gap:14px"><span class="k-lbl">Статус</span><span class="chip с">выдан</span></div>
+       <div style="font:500 18px var(--т);color:var(--второй);margin-top:22px">Инструктаж: отметка в журнале</div></div>`);
+const кадрКамеры = (w, h, рамка) => `<svg width="${w}" height="${h}" viewBox="0 0 322 220" style="display:block;border-radius:8px;background:#1c2a36">
+    <rect x="0" y="168" width="322" height="52" fill="#34444f"/>
+    <rect x="22" y="96" width="190" height="9" fill="#7f95a5"/><rect x="40" y="105" width="8" height="63" fill="#7f95a5"/><rect x="186" y="105" width="8" height="63" fill="#7f95a5"/>
+    <line x1="48" y1="168" x2="186" y2="110" stroke="#5f7383" stroke-width="4"/>
+    <rect x="246" y="98" width="26" height="40" rx="4" fill="#e8792b"/>
+    <rect x="248" y="112" width="22" height="4" fill="#f3f3f3"/><rect x="248" y="122" width="22" height="4" fill="#f3f3f3"/>
+    <line x1="252" y1="138" x2="250" y2="168" stroke="#2c3a46" stroke-width="7"/><line x1="266" y1="138" x2="268" y2="168" stroke="#2c3a46" stroke-width="7"/>
+    <circle cx="259" cy="86" r="11" fill="#d9b08c"/>
+    ${рамка ? `<rect class="рамка" x="240" y="66" width="38" height="36" rx="3" fill="none" stroke="#ff4d5e" stroke-width="3" stroke-dasharray="7 5"/>
+    <rect x="186" y="34" width="112" height="24" rx="4" fill="#C8102E"/><text x="242" y="51" text-anchor="middle" fill="#fff" style="font:700 15px Onest,Segoe UI">нет каски</text>` : ''}
+    <circle cx="18" cy="18" r="6" fill="#ff4d5e"/><text x="30" y="23" fill="#e6eef4" style="font:700 14px 'JetBrains Mono'">REC</text></svg>`;
+const окноTUMAR = (мал) => `<div class="wbar"><i></i>${мал ? 'TUMAR' : 'TUMAR · видеоаналитика'}</div>` + (мал
+  ? `<div class="abs" style="left:20px;top:70px;display:flex;gap:16px;align-items:center">${кадрКамеры(150, 102, true)}<div style="font:600 18px/1.3 var(--т);color:var(--красный)">нет каски<br><span style="color:var(--второй)">08:14</span></div></div>`
+  : `<div class="событие">СОБЫТИЕ 08:14</div>
+     <div class="abs" style="left:24px;top:116px">${кадрКамеры(318, 218, true)}</div>
+     <div class="abs" style="left:24px;right:24px;top:356px"><div style="font:500 18px var(--т);color:var(--второй)">Камера на устье · ПСП-5</div>
+       <div style="font:600 22px/1.3 var(--т);color:var(--красный);margin-top:10px">Нарушение СИЗ: работник без каски</div></div>`);
+const спидометр = (w) => `<svg width="${w}" height="${w * .6}" viewBox="0 0 322 194" style="display:block;overflow:visible">
+    <path d="M31,170 A130,130 0 0 1 161,40" fill="none" stroke="#1B8A4C" stroke-width="16"/>
+    <path d="M161,40 A130,130 0 0 1 291,170" fill="none" stroke="#C8102E" stroke-width="16"/>
+    ${[0, 30, 60, 90, 120].map(v => { const a = Math.PI * (1 - v / 120); return `<line x1="${161 + 108 * Math.cos(a)}" y1="${170 - 108 * Math.sin(a)}" x2="${161 + 96 * Math.cos(a)}" y2="${170 - 96 * Math.sin(a)}" stroke="#231F20" stroke-width="3"/>`; }).join('')}
+    <text x="161" y="22" text-anchor="middle" fill="#55606B" style="font:600 15px Onest">лимит 60</text>
+    <line class="стрелка" x1="161" y1="170" x2="51" y2="170" stroke="#231F20" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="161" cy="170" r="11" fill="#231F20"/></svg>`;
+const окноПоездки = (мал) => `<div class="wbar"><i></i>${мал ? 'Поездки' : 'Управление поездками'}</div>` + (мал
+  ? `<div class="abs" style="left:20px;top:78px"><span style="font:900 44px/1 var(--з);color:var(--красный)">76 км/ч</span> <span style="font:700 22px var(--п);color:var(--второй)">при 60</span></div>`
+  : `<div class="событие">СОБЫТИЕ 08:31</div>
+     <div class="abs" style="left:24px;top:120px">${спидометр(318)}</div>
+     <div class="abs" style="left:24px;right:24px;top:326px"><div style="white-space:nowrap"><span style="font:900 58px/1 var(--з);color:var(--красный)">76 км/ч</span>
+       <span style="font:700 26px var(--п);color:var(--второй);margin-left:6px">при 60</span></div>
+       <div style="font:500 18px var(--т);color:var(--второй);margin-top:18px">Вахтовый рейс · ПСП-5</div>
+       <div style="font:600 22px var(--т);color:var(--красный);margin-top:8px">Превышение скорости</div></div>`);
+const окноҚорғау = (мал) => `<div class="wbar"><i></i>${мал ? 'Қорғау' : 'Қорғау · опасности'}</div>` + (мал
+  ? `<div class="abs" style="left:20px;top:76px"><div style="font:600 18px var(--т);color:var(--второй)">Нет ограждения у эстакады</div><div class="chip к" style="margin-top:12px">открыта 3 дня</div></div>`
+  : `<div class="событие">СОБЫТИЕ · 3 дня</div>
+     <div class="abs" style="left:24px;right:24px;top:130px"><div class="k-lbl">Сообщение об опасности</div>
+       <div style="font:600 26px/1.3 var(--т);margin-top:12px">Нет ограждения у эстакады</div>
+       <div style="font:500 18px var(--т);color:var(--второй);margin-top:10px">ПСП-5 · подал работник смены</div>
+       <div class="chip к" style="margin-top:40px;font-size:22px">открыта 3 дня</div>
+       <div style="margin-top:34px;height:12px;border-radius:6px;background:#E6EEF4;width:92%"></div>
+       <div style="margin-top:12px;height:12px;border-radius:6px;background:#E6EEF4;width:70%"></div></div>`);
+const ОКНА = [окноЭНД, окноTUMAR, окноПоездки, окноҚорғау];
+
+/* ---------- МАКЕТЫ ---------- */
+const КОЛ = [176, 124, 220, 104, 210, 100, 106];   // колонки таблицы нарядов
+const МАКЕТЫ = {
+  интро: `<div class="abs" style="left:110px;top:58px;font:500 18px var(--м);letter-spacing:.12em;text-transform:uppercase;color:#90D6F7">Работы повышенной опасности · группа КМГ</div>
+    ${ЦИФРЫ.map(ц => `<div class="н-блок" style="left:700px;top:250px;width:1100px"><div class="н-число" style="color:${ц.цв};text-shadow:0 0 70px ${ц.цв === 'var(--янтарь)' ? 'rgba(217,142,4,.35)' : 'rgba(255,40,70,.4)'}">${ц.ч}</div><div class="н-подп">${ц.п}</div></div>`).join('')}
+    <div class="ист-л abs" style="left:110px;right:110px;bottom:56px;font:500 17px/1.4 var(--т);color:#8fa9c0">Источники: годовой отчёт АО НК «КазМунайГаз» за 2025 год; заседание Правительства 02.06.2026; сообщение компании за первое полугодие 2026</div>`,
+
+  контуры: `${угол}<div class="rig">
+    ${ОКНА.map((о, i) => `<div class="win ок" style="left:${ПОЛОЖЕНИЕ[i]}px;top:220px;width:370px;height:530px">${о(false)}</div>`).join('')}
+    <svg class="abs" width="1920" height="1080" style="left:0;top:0;overflow:visible">
+      ${ПОЛОЖЕНИЕ.map((x, i) => { const c = x + 185, л = i ? x - 40 + 34 : c, п = i < 3 ? x + 370 + 40 - 34 : c;
+        return `<path class="пункт" d="M${c},752 V820 M${c},820 H${л} M${c},820 H${п}" fill="none" stroke="#0089C4" stroke-width="4"/>`; }).join('')}
+      ${[0, 1, 2].map(i => `<g class="обрыв" data-x="${ПОЛОЖЕНИЕ[i] + 410}"><circle r="17" fill="#FDE8EB" stroke="#C8102E" stroke-width="3"/><path d="M-7,-7 L7,7 M7,-7 L-7,7" stroke="#C8102E" stroke-width="4" stroke-linecap="round"/></g>`).join('')}
+    </svg></div>`,
+
+  индекс: `${угол}<div class="rig">
+    <svg class="abs" width="1920" height="1080" style="left:0;top:0">
+      ${['M390,270 C500,270 500,330 600,330', 'M390,740 C500,740 500,640 600,640', 'M1530,270 C1420,270 1420,330 1320,330', 'M1530,740 C1420,740 1420,640 1320,640']
+        .map(d => `<path class="нить" d="${d}" fill="none" stroke="#02AEF0" stroke-width="4"/><circle class="бусина" r="7" fill="#02AEF0"/>`).join('')}
+    </svg>
+    ${[[90, 170], [90, 640], [1530, 170], [1530, 640]].map(([x, y], i) => `<div class="win мал" style="left:${x}px;top:${y}px;width:300px;height:200px">${ОКНА[i](true)}</div>`).join('')}
+    <div class="card инд" style="overflow:hidden;left:600px;top:130px;width:720px;height:700px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="k-lbl">Индекс риска наряда</div><div style="font:700 40px var(--м);margin-top:6px">НД-3321</div></div>
+        <div class="плашка до" style="margin-top:4px">считается до выдачи наряда</div></div>
+      <div style="display:flex;align-items:center;gap:30px;margin-top:22px">
+        <div class="число k-val" style="font-size:132px;width:200px;font-variant-numeric:tabular-nums">0</div>
+        <div style="display:flex;gap:14px;padding:12px 16px;border:2px solid var(--чернила);border-radius:40px;background:#231F20">
+          ${['з', 'ж', 'к'].map(c => `<div class="лампа" data-c="${c}" style="width:50px;height:50px;border-radius:50%;background:${ЦВ[c]}"></div>`).join('')}</div>
+        <div class="chip к эск" style="font-size:20px;margin-left:auto">Эскалация</div></div>
+      <div class="полоса" style="margin-top:20px;height:22px;border-radius:12px"><i class="шкала"></i></div>
+      <div class="k-lbl" style="margin-top:30px">Почему такой индекс</div>
+      ${ФАКТОРЫ.map(([т, и, в]) => `<div class="фак" style="display:flex;align-items:center;gap:12px;height:58px;border-bottom:1.5px solid var(--линия)">
+         <span style="font:600 22px var(--т)">${т}</span><span class="ист">${и}</span><span style="margin-left:auto;font:700 26px var(--м);color:var(--красный)">+${в}</span></div>`).join('')}
+    </div></div>`,
+
+  мастер: `${угол}<div class="rig">
+    <div class="win экр" style="left:90px;top:120px;width:1740px;height:810px">
+      <div class="wbar"><i></i>Индекс риска · Экран мастера<span class="sp"></span><span class="плашка">Демонстрационные данные</span></div>
+      <div class="abs" style="left:28px;top:74px;font:800 40px var(--п)">Наряды на смену</div>
+      <div class="abs" style="left:30px;top:128px;font:500 17px var(--т);color:var(--второй)">ПСП (пилот) · дневная смена · 7 нарядов в работе</div>
+      <div class="abs" style="left:24px;top:168px;width:1040px">
+        <div style="display:flex;height:44px;align-items:center;border-bottom:2px solid var(--чернила);font:700 15px var(--п);letter-spacing:.1em;color:var(--второй)">
+          ${['СВЕТОФОР', 'НАРЯД', 'ВИД РАБОТ', 'ОБЪЕКТ', 'БРИГАДА', 'НАЧАЛО', 'ИНДЕКС'].map((h, k) => `<div style="width:${КОЛ[k]}px;padding-left:${k ? 4 : 10}px">${h}</div>`).join('')}</div>
+        ${НАРЯДЫ.map(([c, н, в, о, б, п, ч, и], r) => `<div class="стр" style="display:flex;height:80px;align-items:center;border-bottom:1.5px solid var(--линия);font:500 19px var(--т);${r ? '' : 'background:var(--кмг-фон)'}">
+          <div style="width:${КОЛ[0]}px;padding-left:10px"><span class="chip ${c}">${СВЕТ_ИМЯ[c]}</span></div>
+          <div style="width:${КОЛ[1]}px;padding-left:4px;font:700 19px var(--м)">${н}</div>
+          <div style="width:${КОЛ[2]}px;padding-left:4px">${в}</div>
+          <div style="width:${КОЛ[3]}px;padding-left:4px">${о}</div>
+          <div style="width:${КОЛ[4]}px;padding-left:4px;display:flex;gap:8px;align-items:center">${б}${п ? '<span class="подр">подрядная</span>' : ''}</div>
+          <div style="width:${КОЛ[5]}px;padding-left:4px;font:700 19px var(--м)">${ч}</div>
+          <div style="width:${КОЛ[6]}px;padding-left:4px"><div style="font:700 20px var(--м)">${и}</div><div class="полоса" style="height:12px;width:86px;margin-top:4px"><i style="width:${и}%;background:${ЦВ[c]}"></i></div></div>
+        </div>`).join('')}
+      </div>
+      <div class="панель" style="position:absolute;left:1088px;top:70px;width:626px;height:720px;border:2px solid var(--чернила);border-radius:10px;background:#fff;padding:22px 24px">
+        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:700 32px var(--м)">НД-3321</span><span class="chip к">Эскалация</span></div>
+        <div style="font:500 16px var(--т);color:var(--второй);margin-top:6px">Работы на высоте — эстакада · ПСП-5 · КРС-02 · 7 чел.</div>
+        <div style="display:flex;align-items:center;gap:22px;margin-top:10px"><span style="font:900 64px/1 var(--з);color:var(--красный)">87</span><div class="полоса" style="flex:1"><i style="width:87%;background:var(--красный)"></i></div></div>
+        <div class="k-lbl" style="margin-top:18px">Почему такой индекс</div>
+        ${ФАКТОРЫ.map(([т, и, в]) => `<div class="пф" style="display:flex;align-items:center;gap:10px;height:36px;border-bottom:1.5px solid var(--линия);font:500 17px var(--т)">${т}<span class="ист" style="font-size:14px">${и}</span><span style="margin-left:auto;font:700 18px var(--м);color:var(--красный)">+${в}</span></div>`).join('')}
+        <div class="k-lbl" style="margin-top:18px">ИИ-подсказанные мероприятия</div>
+        ${МЕРЫ.map(() => `<div class="мера" style="font:500 17px/1.35 var(--т);margin-top:8px;min-height:23px"></div>`).join('')}
+        <div style="position:absolute;left:24px;right:24px;bottom:22px">
+          <div style="display:flex;gap:12px"><div class="кн" style="flex:1">Допустить с мерами</div><div class="кн" style="flex:1">Отложить работы</div></div>
+          <div class="кн гл главная" style="margin-top:12px;height:56px;font-size:20px">Передать в службу ПБ</div></div>
+      </div>
+      <div class="волна abs" style="width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:3px solid var(--кмг)"></div>
+      <div class="курсор abs" style="width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid var(--чернила);background:rgba(2,174,240,.3);box-shadow:0 6px 14px rgba(0,0,0,.25)"></div>
+    </div></div>`,
+
+  фото: `${угол}<div class="rig">
+    <div class="тел abs" style="left:330px;top:100px;width:420px;height:816px;border:14px solid #231F20;border-radius:56px;background:#fff;overflow:hidden;box-shadow:0 40px 80px rgba(9,46,80,.22)">
+      <div class="abs" style="left:150px;top:12px;width:92px;height:22px;border-radius:12px;background:#231F20"></div>
+      <div class="abs" style="left:20px;top:50px;font:800 28px var(--п)">Фотопроверка</div>
+      <div class="abs" style="left:20px;top:88px;font:500 17px var(--м);color:var(--второй)">НД-3321 · ПСП-5</div>
+      <div class="abs" style="left:16px;top:124px;width:360px;height:470px;border-radius:10px;overflow:hidden">
+        <svg width="360" height="470" viewBox="0 0 360 470" style="display:block">
+          <defs><linearGradient id="небо" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cde9f8"/><stop offset="1" stop-color="#f2f8fc"/></linearGradient>
+            <pattern id="лента" width="24" height="16" patternUnits="userSpaceOnUse"><rect width="12" height="16" fill="#C8102E"/><rect x="12" width="12" height="16" fill="#fff"/></pattern></defs>
+          <rect width="360" height="470" fill="url(#небо)"/>
+          <rect y="300" width="360" height="170" fill="#cdb791"/>
+          <rect x="16" y="196" width="330" height="14" fill="#6f7f8b"/>
+          ${[40, 170, 300].map(x => `<rect x="${x}" y="210" width="12" height="96" fill="#6f7f8b"/>`).join('')}
+          <path d="M52,300 L170,214 M182,300 L300,214" stroke="#8b9aa5" stroke-width="5"/>
+          <line x1="16" y1="150" x2="346" y2="150" stroke="#6f7f8b" stroke-width="5"/>
+          ${[30, 80, 130, 250, 300, 340].map(x => `<line x1="${x}" y1="150" x2="${x}" y2="196" stroke="#6f7f8b" stroke-width="4"/>`).join('')}
+          <line x1="192" y1="196" x2="194" y2="150" stroke="#2c3a46" stroke-width="9"/><line x1="210" y1="196" x2="208" y2="150" stroke="#2c3a46" stroke-width="9"/>
+          <rect x="185" y="104" width="32" height="50" rx="5" fill="#e8792b"/>
+          <rect x="187" y="120" width="28" height="4" fill="#f4f4f4"/><rect x="187" y="132" width="28" height="4" fill="#f4f4f4"/>
+          <path d="M188,106 L214,150 M214,106 L188,150" stroke="#1d2a35" stroke-width="4"/>
+          <path d="M214,118 C240,118 250,130 262,150" stroke="#1d2a35" stroke-width="3" fill="none"/>
+          <circle cx="201" cy="92" r="12" fill="#d9b08c"/>
+          <path d="M187,90 A14,13 0 0 1 215,90 Z" fill="#f2c230"/><rect x="185" y="88" width="32" height="4" rx="2" fill="#f2c230"/>
+          <rect x="20" y="346" width="210" height="16" fill="url(#лента)"/>
+          ${[26, 122, 218].map(x => `<rect x="${x}" y="338" width="8" height="52" fill="#55606B"/>`).join('')}
+          <rect x="300" y="380" width="8" height="74" fill="#55606B"/>
+          <rect x="280" y="378" width="48" height="40" fill="none" stroke="#8b9aa5" stroke-width="2" stroke-dasharray="4 4"/>
+          <g class="рамки">
+            <g><rect x="180" y="74" width="42" height="32" rx="4" fill="none" stroke="#1B8A4C" stroke-width="3"/><rect x="180" y="52" width="58" height="20" rx="3" fill="#1B8A4C"/><text x="209" y="67" text-anchor="middle" fill="#fff" style="font:700 13px Onest">каска</text></g>
+            <g><rect x="178" y="102" width="46" height="56" rx="4" fill="none" stroke="#1B8A4C" stroke-width="3"/><rect x="226" y="102" width="70" height="20" rx="3" fill="#1B8A4C"/><text x="261" y="117" text-anchor="middle" fill="#fff" style="font:700 13px Onest">привязь</text></g>
+            <g><rect x="14" y="330" width="226" height="66" rx="4" fill="none" stroke="#1B8A4C" stroke-width="3"/><rect x="14" y="400" width="104" height="20" rx="3" fill="#1B8A4C"/><text x="66" y="415" text-anchor="middle" fill="#fff" style="font:700 13px Onest">ограждение</text></g>
+            <g><rect x="270" y="368" width="68" height="94" rx="4" fill="none" stroke="#C8102E" stroke-width="3" stroke-dasharray="7 5"/><rect x="250" y="344" width="88" height="20" rx="3" fill="#C8102E"/><text x="294" y="359" text-anchor="middle" fill="#fff" style="font:700 13px Onest">нет знака</text></g>
+          </g></svg>
+        <div class="скан abs" style="left:0;right:0;height:120px;background:linear-gradient(rgba(2,174,240,0),rgba(2,174,240,.28));border-bottom:4px solid #02AEF0"></div>
+      </div>
+      <div class="abs" style="left:20px;right:20px;top:612px;font:500 17px/1.4 var(--т);color:var(--второй)">Снимок сверяется с чек-листом наряда</div>
+      <div class="кн гл abs" style="left:20px;right:20px;bottom:28px">Отправить мастеру</div>
+    </div>
+    <div class="abs пр" style="left:860px;top:150px;width:940px">
+      <div style="font:800 56px/1.1 var(--п)">Фотопроверка места работ</div>
+      <div style="font:500 24px/1.45 var(--т);color:var(--второй);margin-top:18px">Мастер снимает место работ перед допуском — модель сверяет снимок с <span style="white-space:nowrap">чек-листом</span> наряда</div>
+    </div>
+    ${[['Каска', 1], ['Страховочная привязь', 1], ['Ограждение', 1], ['Знак безопасности отсутствует', 0]].map(([т, ок], i) => `<div class="чек abs" style="left:860px;top:${370 + i * 96}px;display:flex;align-items:center;gap:24px;transform-origin:0 50%">
+      <svg width="60" height="60" viewBox="0 0 60 60"><rect x="2" y="2" width="56" height="56" rx="10" fill="${ок ? '#E6F4EC' : '#FDE8EB'}" stroke="${ок ? '#1B8A4C' : '#C8102E'}" stroke-width="3"/>
+        ${ок ? '<path d="M16,31 L26,41 L45,20" fill="none" stroke="#1B8A4C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>' : '<path d="M19,19 L41,41 M41,19 L19,41" stroke="#C8102E" stroke-width="6" stroke-linecap="round"/>'}</svg>
+      <span style="font:700 40px var(--п);color:${ок ? 'var(--чернила)' : 'var(--красный)'}">${т}</span></div>`).join('')}
+    <div class="итог abs" style="left:860px;top:780px;padding:18px 26px;border:2px solid var(--красный);border-radius:10px;background:var(--красный-фон);font:700 30px var(--п);color:var(--красный)">Не пройдена · +15 к индексу наряда НД-3321</div>
+    </div>`,
+
+  дпб: `${угол}<div class="rig">
+    <div class="win экр" style="left:90px;top:120px;width:1740px;height:810px">
+      <div class="wbar"><i></i>Индекс риска · Экран ДПБ<span class="sp"></span><span class="плашка">Демонстрационные данные</span></div>
+      <div class="abs" style="left:28px;top:72px;font:800 40px var(--п)">Карта риска по ДЗО</div>
+      <div class="abs" style="left:30px;top:126px;font:500 17px var(--т);color:var(--второй)">Департамент производственной безопасности · 14 дней</div>
+      <div class="abs" style="left:28px;right:28px;top:162px;height:8px;border-radius:3px;background:linear-gradient(90deg,#02AEF0 0 62%,#90D6F7 62%)"></div>
+      ${ДЗО.map(([код, v, н, к, ж, ист], i) => `<div class="дзо abs" style="left:${28 + i * 240}px;top:188px;width:224px;height:300px;border:${i ? 2 : 3}px solid ${i ? 'var(--чернила)' : 'var(--кмг)'};border-radius:8px;background:#fff;padding:16px 16px">
+         <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:800 34px var(--п)">${код}</span>
+           <span class="chip ${светофор(v)}" style="font:700 18px var(--м);padding:2px 10px 2px 8px">${v}</span></div>
+         <svg width="188" height="64" viewBox="0 0 188 64" style="display:block;margin-top:14px">
+           <path class="площ" d="${путьИскры(i, v, 188, 60)} L188,64 L0,64 Z" fill="#CDEBFA"/>
+           <path class="иск" d="${путьИскры(i, v, 188, 60)}" fill="none" stroke="#0089C4" stroke-width="3"/></svg>
+         <div style="font:500 15px/1.45 var(--т);color:var(--второй);margin-top:12px">нарядов <b style="color:var(--чернила)">${н}</b> · красных <b style="color:var(--чернила)">${к}</b><br>жёлтых <b style="color:var(--чернила)">${ж}</b></div>
+         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${ист.map(s => `<span class="ист" style="font-size:14px">${s}</span>`).join('')}${i ? '' : '<span class="подр" style="font-size:14px">пилот</span>'}</div>
+       </div>`).join('')}
+      <div class="abs" style="left:28px;top:508px;font:700 24px var(--п)">ОМГ · объекты и факторы</div>
+      <div class="abs" style="left:28px;top:548px;width:960px">
+        <div style="display:flex;height:34px;align-items:center;font:600 14px var(--т);letter-spacing:.06em;color:var(--второй)">
+          ${['ОБЪЕКТ', 'СИЗ', 'ОП. ЗОНА', 'СКОРОСТЬ', 'ҚОРҒАУ', 'ИНСТРУКТАЖ', 'ИСТОРИЯ', 'ИНДЕКС'].map((h, k) => `<div style="width:${k ? (k < 7 ? 116 : 110) : 150}px;text-align:${k ? 'center' : 'left'}">${h}</div>`).join('')}</div>
+        ${ТЕПЛО.map(([о, яч, и]) => `<div class="тр" style="display:flex;height:48px;align-items:center;border-top:1.5px solid var(--линия)">
+          <div style="width:150px;font:600 19px var(--т)">${о}</div>
+          ${яч.map(v => `<div style="width:116px;padding:0 3px"><div style="height:40px;border-radius:4px;background:${ЯЧЕЙКА[v]};color:${v === 5 ? '#fff' : '#231F20'};font:700 17px var(--м);display:flex;align-items:center;justify-content:center">${v}</div></div>`).join('')}
+          <div style="width:110px;text-align:center;font:700 22px var(--м);color:${ЦВ[светофор(и)]}">${и}</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="урок card" style="left:1100px;top:622px;width:700px;height:290px;padding:22px 26px;border-color:var(--кмг);border-width:3px">
+      <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:800 28px var(--п)">Извлечённый урок</span><span class="ист">из акта расследования</span></div>
+      <div style="font:500 17px var(--м);color:var(--второй);margin-top:10px">СПО · устье скважины</div>
+      <div style="font:600 27px/1.35 var(--т);margin-top:10px">Падение элеватора при СПО <span style="color:var(--кмг-тёмный)">→</span> проверка троса в чек-листе</div>
+      <div style="font:500 18px var(--т);color:var(--второй);margin-top:14px">Добавлено в чек-лист нарядов на СПО во всех ДЗО</div>
+    </div></div>`,
+
+  эффект: `<div class="abs гч" style="left:140px;top:290px;transform-origin:0 0"><span class="г-число" style="font:900 150px/.95 var(--з);letter-spacing:-.03em;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums">1,8</span></div>
+    <div class="abs гп" style="left:110px;right:110px;top:520px;text-align:center;font:700 46px/1.25 var(--п);color:#dfeaf3">несчастных случая в год на одно ДЗО — <span style="color:#5fd394">не произойдут</span></div>
+    <div class="abs ярл" style="left:140px;top:208px;padding:8px 18px;border-radius:8px;background:#1B8A4C;color:#fff;font:700 24px var(--п);letter-spacing:.08em;text-transform:uppercase">Не произойдут</div>
+    ${[['', 'несчастных случая в год на одно ДЗО'], ['≈ 7', 'в год на четырёх ДЗО'], ['> 20', 'за три года']].map(([ч, п], i) => `<div class="сл abs" style="left:${140 + i * 560}px;top:290px;width:520px">
+      <div style="font:900 150px/.95 var(--з);letter-spacing:-.03em;color:#fff;white-space:nowrap;height:143px">${ч}</div>
+      <div class="сп" style="font:700 34px/1.25 var(--п);color:#dfeaf3;margin-top:18px">${п}</div></div>`).join('')}
+    <div class="деньги abs" style="left:140px;right:140px;top:650px;padding-top:30px;border-top:2px solid rgba(144,214,247,.25);font:700 32px/1.4 var(--п);color:#9fb6c9">
+      <span style="color:#90D6F7">+44 млн тг</span> в год на ДЗО со второго года — экономика по открытой формуле*</div>`,
+
+  финал: `<div class="abs" style="left:0;right:0;top:0;bottom:0">
+    <img class="ф-лого abs" src="assets/лого_кмг.png" alt="" style="left:530px;top:200px;width:860px">
+    <div class="ф-пол abs" style="left:530px;top:400px;width:860px;height:10px;border-radius:3px;background:linear-gradient(90deg,#02AEF0 0 62%,#90D6F7 62%);transform-origin:0 50%"></div>
+    <div class="ф-с abs" style="left:0;right:0;top:462px;text-align:center;font:900 64px/1.1 var(--з);letter-spacing:-.01em">Индекс риска работ повышенной опасности</div>
+    <div class="ф-с abs" style="left:0;right:0;top:572px;text-align:center;font:800 54px var(--п);color:var(--кмг-тёмный)">Сначала люди, потом тенге</div>
+    <div class="ф-с abs" style="left:0;right:0;top:730px;text-align:center;font:500 22px var(--т);color:var(--второй)">Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026 · ТОО «KMG Digital»</div>
+    <div class="ф-с abs" style="left:0;right:0;top:776px;text-align:center;font:500 24px var(--м);color:var(--кмг-тёмный)">nochnik.github.io/KMG-HSE-RISK</div></div>`
+};
+
+/* ---------- АНИМАЦИЯ: всё — функция от lt; q — только кэш элементов и неизменных размеров ---------- */
+const $$ = (el, s) => [...el.querySelectorAll(s)];
+const pop = (el, lt, at, d = .5, from = .6) => { el.style.opacity = prog(lt, at, at + .08); return lerp(from, 1, E.outBack(prog(lt, at, at + d))); };
+const выезд = (el, lt, at, d = .7, dy = 70) => { el.style.opacity = prog(lt, at, at + d * .5); return (1 - E.outCubic(prog(lt, at, at + d))) * dy; };
+const камера = (rig, lt, длит, a, b) => { const p = E.inOutSine(prog(lt, 0, длит)); const v = a.map((x, i) => lerp(x, b[i], p));
+  rig.style.transform = `translate(${v[4]}px,${v[5]}px) scale(${v[3]}) rotateX(${v[0]}deg) rotateY(${v[1]}deg) rotateZ(${v[2]}deg)`; };
+// прорисовка линии: сплошной (dash = 0) или пунктиром заданного шага
+const линия = (path, p, dash = 0, gap = 0) => {
+  const L = path._L ||= path.getTotalLength(), d = L * clamp01(p);
+  if (!dash) { path.style.strokeDasharray = `${L} ${L}`; path.style.strokeDashoffset = L - d; return; }
+  const a = []; let s = 0; while (s + dash + gap <= d) { a.push(dash, gap); s += dash + gap; }
+  a.push(Math.max(0, Math.min(dash, d - s)), L + 10); path.style.strokeDasharray = a.join(' ');
+};
+const мир = el => el.firstChild;
+
+const АНИМАЦИЯ = {
+  интро(el, lt, q) {
+    q.бл ||= $$(el, '.н-блок'); q.ист ||= el.querySelector('.ист-л'); q.h ||= q.бл.map(b => b.offsetHeight);
+    мир(el).style.backgroundPosition = `${-lt * 8}px ${-lt * 4}px, 0 0`;
+    // каждое число выпрыгивает справа крупно, потом уезжает в колонку слева и уменьшается
+    const АТ = [.4, 2.4, 4.4], СЛОТ = [[110, 190], [110, 480]], М = .5, ГЕРОЙ = [700, 250];
+    q.бл.forEach((b, i) => {
+      const sc = pop(b, lt, АТ[i], .6, .6);
+      const m = i < 2 ? E.inOutCubic(prog(lt, АТ[i + 1] - .3, АТ[i + 1] + .4)) : 0, сл = СЛОТ[i] || ГЕРОЙ;
+      const x = (сл[0] - ГЕРОЙ[0]) * m + (1 - sc) * 550, y = (сл[1] - ГЕРОЙ[1]) * m + (1 - sc) * q.h[i] / 2;
+      b.style.transform = `translate(${x}px,${y}px) scale(${sc * lerp(1, М, m)})`;
+    });
+    q.бл[0].firstChild.textContent = счёт(lerp(0, 10.38, E.outCubic(prog(lt, .45, 1.9))), 2);
+    q.бл[2].firstChild.textContent = String(Math.round(lerp(0, 3, E.outCubic(prog(lt, 4.45, 5.2)))));
+    q.ист.style.opacity = prog(lt, 1.2, 1.8) * .95;
+  },
+
+  контуры(el, lt, q, с) {
+    q.rig ||= el.querySelector('.rig'); q.ок ||= $$(el, '.ок'); q.соб ||= $$(el, '.событие'); q.п ||= $$(el, '.пункт'); q.об ||= $$(el, '.обрыв');
+    q.стр ||= el.querySelector('.стрелка'); q.рам ||= el.querySelector('.ок .рамка');
+    камера(q.rig, lt, с.длит + ПЕРЕХОД, [0, 0, 0, .97, 0, 10], [0, 0, 0, 1.02, 0, -6]);
+    q.ок.forEach((w, i) => {
+      const at = 2.3 + i * .5, вспышка = prog(lt, at, at + .12) * (1 - prog(lt, at + .2, at + 1.1));
+      w.style.transform = `translateY(${выезд(w, lt, .25 + i * .3, .8, 90)}px)`;
+      w.style.boxShadow = `0 34px 70px rgba(9,46,80,.14),0 0 0 ${10 * вспышка}px rgba(200,16,46,${.35 * вспышка})`;
+      q.соб[i].style.transform = `scale(${pop(q.соб[i], lt, at, .45, .4)})`;
+    });
+    const a = Math.PI * (1 - lerp(0, 76, E.outCubic(prog(lt, 1.6, 3.4))) / 120);      // стрелка спидометра 0 → 76
+    q.стр.setAttribute('x2', 161 + 110 * Math.cos(a)); q.стр.setAttribute('y2', 170 - 110 * Math.sin(a));
+    q.рам.style.opacity = .4 + .6 * (Math.floor(lt * 3) % 2);
+    q.п.forEach((p, i) => линия(p, E.inOutCubic(prog(lt, 4.4 + i * .2, 5.8 + i * .2)), 12, 9));
+    q.об.forEach((g, i) => g.setAttribute('transform', `translate(${g.dataset.x},820) scale(${pop(g, lt, 6.1 + i * .3, .45, .2)})`));
+  },
+
+  индекс(el, lt, q, с) {
+    q.rig ||= el.querySelector('.rig'); q.ок ||= $$(el, '.мал'); q.н ||= $$(el, '.нить'); q.б ||= $$(el, '.бусина');
+    q.к ||= el.querySelector('.инд'); q.ч ||= el.querySelector('.число'); q.ш ||= el.querySelector('.шкала'); q.ф ||= $$(el, '.фак');
+    q.л ||= $$(el, '.лампа'); q.эск ||= el.querySelector('.эск'); q.до ||= el.querySelector('.до');
+    камера(q.rig, lt, с.длит + ПЕРЕХОД, [0, 0, 0, .98, 0, 0], [0, 0, 0, 1.05, 0, 6]);
+    const ИЗ = [[285, 485], [735, 485], [1185, 485], [1635, 485]], В = [[240, 270], [240, 740], [1680, 270], [1680, 740]];  // из ряда «контуров» по углам
+    q.ок.forEach((w, i) => { const m = E.inOutCubic(prog(lt, .15 + i * .08, 1.35 + i * .08));
+      w.style.opacity = prog(lt, 0, .25);
+      w.style.transform = `translate(${(ИЗ[i][0] - В[i][0]) * (1 - m)}px,${(ИЗ[i][1] - В[i][1]) * (1 - m)}px) scale(${lerp(1.3, 1, m)})`; });
+    q.н.forEach((p, i) => линия(p, E.inOutCubic(prog(lt, 1.5 + i * .12, 2.4 + i * .12))));
+    q.б.forEach((b, i) => { const p = q.н[i], u = ((lt - 2.5) * .55 + i * .27) % 1;
+      if (lt < 2.5) { b.style.opacity = 0; return; } const pt = p.getPointAtLength(u * p._L);
+      b.setAttribute('cx', pt.x); b.setAttribute('cy', pt.y); b.style.opacity = Math.sin(Math.PI * u); });
+    q.к.style.transform = `scale(${pop(q.к, lt, 1.2, .7, .8)})`;
+    // факторы выпадают по одному, индекс = сумма уже выпавших (0 → 87)
+    let v = 0;
+    q.ф.forEach((f, i) => { const at = 2.7 + i * .75; f.style.transform = `translateX(${выезд(f, lt, at, .5, 30)}px)`;
+      v += ФАКТОРЫ[i][2] * E.outCubic(prog(lt, at, at + .6)); });
+    const c = светофор(v);
+    q.ч.textContent = Math.round(v); q.ч.style.color = ЦВ[c];
+    q.ш.style.width = v + '%'; q.ш.style.background = ЦВ[c];
+    q.л.forEach(l => { const on = l.dataset.c === c; l.style.opacity = on ? 1 : .22; l.style.boxShadow = on ? `0 0 26px ${ЦВ[c]}` : 'none'; });
+    q.эск.style.transform = `scale(${pop(q.эск, lt, 6.9, .5, .5)})`;
+    q.до.style.opacity = prog(lt, 7.6, 8.1);
+  },
+
+  мастер(el, lt, q, с) {
+    q.rig ||= el.querySelector('.rig'); q.окн ||= el.querySelector('.экр'); q.стр ||= $$(el, '.стр'); q.пан ||= el.querySelector('.панель');
+    q.пф ||= $$(el, '.пф'); q.мер ||= $$(el, '.мера'); q.кн ||= el.querySelector('.главная'); q.кур ||= el.querySelector('.курсор'); q.вол ||= el.querySelector('.волна');
+    камера(q.rig, lt, с.длит + ПЕРЕХОД, [0, 0, 0, .97, 0, 6], [0, 0, 0, 1.0, 0, 0]);
+    q.окн.style.transform = `translateY(${выезд(q.окн, lt, .1, .8, 60)}px)`;
+    q.стр.forEach((r, i) => r.style.transform = `translateX(${выезд(r, lt, .7 + i * .16, .5, -50)}px)`);
+    q.пан.style.transform = `translateX(${выезд(q.пан, lt, 2.0, .8, 160)}px)`;
+    q.пф.forEach((f, i) => f.style.opacity = prog(lt, 2.6 + i * .15, 2.9 + i * .15));
+    q.мер.forEach((m, i) => m.textContent = typed(МЕРЫ[i], prog(lt, 3.6 + i * .95, 4.4 + i * .95)));
+    // курсор-кружок едет к «Передать в службу ПБ» и нажимает
+    const ц = [1610, 742], ст = [1260, 420], m = E.inOutCubic(prog(lt, 6.7, 7.7));
+    const x = lerp(ст[0], ц[0], m) + Math.sin(Math.PI * m) * 60, y = lerp(ст[1], ц[1], m);
+    const наж = prog(lt, 7.85, 7.95) * (1 - prog(lt, 8.05, 8.2));
+    q.кур.style.opacity = prog(lt, 6.4, 6.7); q.кур.style.left = x + 'px'; q.кур.style.top = y + 'px'; q.кур.style.transform = `scale(${1 - .25 * наж})`;
+    q.кн.style.transform = `scale(${1 - .04 * наж})`;
+    const нажато = lt >= 7.95;
+    q.кн.style.background = нажато ? '#0089C4' : ''; q.кн.textContent = нажато ? 'Передано в службу ПБ · 08:02' : 'Передать в службу ПБ';
+    const в = prog(lt, 7.95, 8.8); q.вол.style.left = ц[0] + 'px'; q.вол.style.top = ц[1] + 'px';
+    q.вол.style.opacity = в > 0 && в < 1 ? 1 - в : 0; q.вол.style.transform = `scale(${1 + в * 3})`;
+  },
+
+  фото(el, lt, q, с) {
+    q.rig ||= el.querySelector('.rig'); q.тел ||= el.querySelector('.тел'); q.ск ||= el.querySelector('.скан'); q.рам ||= $$(el, '.рамки > g');
+    q.чек ||= $$(el, '.чек'); q.ит ||= el.querySelector('.итог'); q.пр ||= el.querySelector('.пр');
+    камера(q.rig, lt, с.длит + ПЕРЕХОД, [0, 0, 0, .98, 0, 0], [0, 0, 0, 1.03, 0, 0]);
+    q.тел.style.transform = `translateY(${выезд(q.тел, lt, .1, .8, 120)}px)`;
+    q.пр.style.transform = `translateY(${выезд(q.пр, lt, .4, .7, 40)}px)`;
+    const f = prog(lt, 1.1, 4.1);                                                   // линия скана сверху вниз
+    q.ск.style.top = (f * 470 - 120) + 'px'; q.ск.style.opacity = lt < 1.1 ? 0 : 1 - prog(lt, 4.1, 4.5);
+    const ПОР = [.2, .28, .78, .88];                                                  // где по высоте снимка стоит каждая рамка
+    q.рам.forEach((g, i) => g.style.opacity = prog(lt, 1.1 + 3 * ПОР[i], 1.25 + 3 * ПОР[i]));
+    q.чек.forEach((ч, i) => ч.style.transform = `scale(${pop(ч, lt, 1.2 + 3 * ПОР[i], .5, .6)})`);
+    q.ит.style.transform = `translateY(${выезд(q.ит, lt, 4.7, .6, 30)}px)`;
+  },
+
+  дпб(el, lt, q, с) {
+    q.rig ||= el.querySelector('.rig'); q.окн ||= el.querySelector('.экр'); q.д ||= $$(el, '.дзо'); q.и ||= $$(el, '.иск'); q.пл ||= $$(el, '.площ');
+    q.т ||= $$(el, '.тр'); q.у ||= el.querySelector('.урок');
+    камера(q.rig, lt, с.длит + ПЕРЕХОД, [0, 0, 0, .97, 0, 6], [0, 0, 0, 1.0, 0, 0]);
+    q.окн.style.transform = `translateY(${выезд(q.окн, lt, .1, .8, 60)}px)`;
+    q.д.forEach((d, i) => d.style.transform = `translateY(${выезд(d, lt, .5 + i * .1, .6, 40)}px)`);
+    q.и.forEach((p, i) => линия(p, E.inOutCubic(prog(lt, 1.0 + i * .1, 2.2 + i * .1))));
+    q.пл.forEach((p, i) => p.style.opacity = prog(lt, 1.8 + i * .1, 2.4 + i * .1));
+    q.т.forEach((r, i) => r.style.opacity = prog(lt, 2.0 + i * .15, 2.4 + i * .15));
+    // карточка урока летит из правого верхнего угла по дуге
+    const m = E.outCubic(prog(lt, 3.3, 4.6)), x = lerp(700, 0, m), y = lerp(-760, 0, m) - Math.sin(Math.PI * m) * 120;
+    q.у.style.opacity = prog(lt, 3.3, 3.5); q.у.style.transform = `translate(${x}px,${y}px) rotate(${lerp(14, 0, m)}deg) scale(${lerp(.7, 1, m)})`;
+  },
+
+  эффект(el, lt, q) {
+    q.гч ||= el.querySelector('.гч'); q.гн ||= el.querySelector('.г-число'); q.гп ||= el.querySelector('.гп'); q.ярл ||= el.querySelector('.ярл');
+    q.сл ||= $$(el, '.сл'); q.ден ||= el.querySelector('.деньги');
+    if (q.w === undefined) { q.гн.textContent = '1,8'; q.w = q.гн.offsetWidth; }       // ширина итогового числа — константа вёрстки
+    мир(el).style.backgroundPosition = `${-lt * 8}px ${-lt * 4}px, 0 0`;
+    // герой «1,8» (×2) в центре → садится в первую ячейку ряда (×1)
+    const m = E.inOutCubic(prog(lt, 3.4, 4.3)), sc = pop(q.гч, lt, .3, .6, .7);
+    const s = lerp(2, 1, m) * sc, x = lerp(820 - q.w, 0, m) + (1 - sc) * q.w, y = lerp(-110, 0, m) + (1 - sc) * 143;
+    q.гч.style.transform = `translate(${x}px,${y}px) scale(${s})`;
+    q.гн.textContent = счёт(lerp(0, 1.8, E.outCubic(prog(lt, .35, 1.8))), 1);
+    q.гп.style.opacity = prog(lt, 1.0, 1.5) * (1 - prog(lt, 3.1, 3.5)); q.гп.style.transform = `translateY(${(1 - E.outCubic(prog(lt, 1.0, 1.6))) * 30}px)`;
+    q.ярл.style.transform = `translateY(${выезд(q.ярл, lt, 4.1, .5, 20)}px)`;
+    q.сл[0].querySelector('.сп').style.opacity = prog(lt, 4.2, 4.7);
+    [[4.6, 7, '≈ '], [5.4, 20, '> ']].forEach(([at, v, пр], k) => { const b = q.сл[k + 1], sc2 = pop(b, lt, at, .6, .6);
+      b.style.transformOrigin = '0 30%'; b.style.transform = `scale(${sc2})`;
+      b.firstElementChild.textContent = пр + Math.round(lerp(0, v, E.outCubic(prog(lt, at, at + 1.0)))); });
+    q.ден.style.transform = `translateY(${выезд(q.ден, lt, 6.8, .7, 30)}px)`;
+  },
+
+  финал(el, lt, q) {
+    q.л ||= el.querySelector('.ф-лого'); q.п ||= el.querySelector('.ф-пол'); q.с ||= $$(el, '.ф-с');
+    q.л.style.transform = `scale(${pop(q.л, lt, .3, .8, .6)})`;
+    q.п.style.transform = `scaleX(${E.outExpo(prog(lt, .9, 1.7))})`;
+    q.с.forEach((s, i) => s.style.transform = `translateY(${выезд(s, lt, 1.3 + i * .45, .7, 30)}px)`);
+  }
+};
+
+/* ---------- Сборка ---------- */
+const stage = document.getElementById('stage'), layer = document.getElementById('layer');
+const ITEMS = СЦЕНЫ.map(с => {
+  const el = document.createElement('div'); el.className = 'item'; const м = МИРЫ[с.id]; el.style.setProperty('--bg', м.bg);
+  el.innerHTML = `<div class="world" style="--bg:${м.bg};--acc:${м.acc}">${МАКЕТЫ[с.id]}</div>`;
+  layer.appendChild(el); return { ...с, el, on: false, q: {} };
+});
+
+/* ---------- canvas: расходящиеся кольца «радара» в интро ---------- */
+const cx = document.getElementById('fx').getContext('2d');
+function фон(t) {
+  cx.clearRect(0, 0, W, H);
+  if (t > 6.6) return;
+  const a = prog(t, 0, 1) * (1 - prog(t, 5.6, 6.6));
+  for (let k = 0; k < 5; k++) { const u = ((t * .22) + k / 5) % 1;
+    cx.beginPath(); cx.arc(1250, 450, 120 + u * 900, 0, Math.PI * 2);
+    cx.strokeStyle = `rgba(144,214,247,${.10 * (1 - u) * a})`; cx.lineWidth = 2; cx.stroke(); }
+}
+
+/* ---------- Кадр ---------- */
+const tag = document.getElementById('tag'), tagN = document.getElementById('tagN'), метка = document.getElementById('метка');
+function renderAt(t) {
+  t = Math.min(Math.max(t, 0), DUR - 1e-4);
+  let cur = null;
+  for (const it of ITEMS) {
+    const on = t >= it.t0 && t < it.t1;
+    if (on !== it.on) { it.el.classList.toggle('on', on); it.on = on; }
+    if (!on) continue;
+    const lt = t - it.t0;
+    const pr = it.i ? E.inOutCubic(prog(lt, 0, ПЕРЕХОД)) : 1;
+    it.el.style.clipPath = pr < 1 ? `circle(${pr * 1200}px at 960px 540px)` : 'none';
+    const out = it.i < ITEMS.length - 1 ? prog(t, it.t1 - ПЕРЕХОД, it.t1) : 0;
+    it.el.firstChild.style.transform = out ? `scale(${1 - .06 * out})` : '';
+    АНИМАЦИЯ[it.id](it.el, lt, it.q, it);
+    if (lt > ПЕРЕХОД * .5) cur = it;
+  }
+  const вид = cur && cur.подпись && t - cur.t0 > .9 && t < cur.t1 - ПЕРЕХОД * .6;
+  tag.style.opacity = вид ? prog(t - cur.t0, .9, 1.3) : 0;
+  метка.style.opacity = вид ? prog(t - cur.t0, .9, 1.3) : 0;
+  if (cur) { const м = МИРЫ[cur.id]; tagN.textContent = cur.подпись; tag.style.color = м.tag; метка.style.color = м.метка;
+    метка.textContent = `${String(cur.i + 1).padStart(2, '0')} / ${String(СЦЕНЫ.length).padStart(2, '0')} · ${cur.имя}`; }
+  фон(t);
+}
+
+// Готовность: ровно те шрифты, что в кадре, и логотип
+const ready = (async () => {
+  try { await Promise.all(['900 40px "Inter Tight"', '700 40px "Jost"', '800 40px "Jost"', '500 16px "JetBrains Mono"', '700 16px "JetBrains Mono"',
+    '500 20px "Onest"', '600 20px "Onest"', '800 20px "Onest"'].map(f => document.fonts.load(f, 'АБВ abc 123'))); await document.fonts.ready; } catch (e) {}
+  const лого = new Image(); лого.src = 'assets/лого_кмг.png'; try { await лого.decode(); } catch (e) {}
+  await Promise.all([...document.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+  renderAt(0);
+})();
+window.__story = { duration: DUR, fps: FPS, width: W, height: H, renderAt, ready };
+
+/* ---------- Плеер ---------- */
+const $ = id => document.getElementById(id), wrap = $('wrap');
+if (new URLSearchParams(location.search).has('render')) { document.body.classList.add('render'); wrap.style.width = W + 'px'; wrap.style.height = H + 'px'; }
+else {
+  let t = 0, playing = false, last = performance.now(), rate = 1, dirty = true;
+  $('td').textContent = DUR.toFixed(2); $('scrub').max = DUR;
+  СЦЕНЫ.forEach(с => { const s = document.createElement('span'); s.textContent = с.имя || с.id; s.onclick = () => { t = с.t0 + .01; dirty = true; }; $('chips').appendChild(s); });
+  const chips = [...$('chips').children];
+  const layout = () => { const s = Math.min((innerWidth - 32) / W, (innerHeight - $('chips').parentElement.offsetHeight - 48) / H); wrap.style.width = W * s + 'px'; wrap.style.height = H * s + 'px'; stage.style.transform = `scale(${s})`; };
+  addEventListener('resize', layout); layout();
+  const setPlay = p => { playing = p; $('play').textContent = p ? '❚❚ Пауза' : '▶ Play'; };
+  $('play').onclick = () => setPlay(!playing); $('restart').onclick = () => { t = 0; dirty = true; setPlay(true); };
+  $('rate').onclick = () => { rate = rate === 1 ? .5 : rate === .5 ? .25 : 1; $('rate').textContent = rate + '×'; };
+  $('scrub').oninput = e => { t = +e.target.value; dirty = true; setPlay(false); };
+  addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); setPlay(!playing); }
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setPlay(false); t = Math.min(DUR - 1 / FPS, Math.max(0, t + (e.key === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 1 : 1 / FPS))); dirty = true; }
+  });
+  ready.then(() => { (function tick(now) {
+    const dt = (now - last) / 1000; last = now;
+    if (playing) { t += dt * rate; if (t >= DUR - 1 / FPS) { t = DUR - 1 / FPS; setPlay(false); } dirty = true; }
+    if (dirty) { renderAt(t); dirty = false; $('tc').textContent = t.toFixed(2).padStart(6, '0'); $('fc').textContent = Math.floor(t * FPS); $('scrub').value = t;
+      chips.forEach((c, i) => c.classList.toggle('on', t >= СЦЕНЫ[i].t0 && (i === СЦЕНЫ.length - 1 || t < СЦЕНЫ[i + 1].t0))); }
+    requestAnimationFrame(tick); })(performance.now()); });
+}
+</script>
+</body>
+</html>

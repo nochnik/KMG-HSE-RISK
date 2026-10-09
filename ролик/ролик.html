@@ -79,6 +79,21 @@ body.render .stage-wrap{border-radius:0;box-shadow:none}
 .н-блок{position:absolute;transform-origin:0 0}
 .н-число{font:900 260px/.95 var(--з);letter-spacing:-.03em;white-space:nowrap;font-variant-numeric:tabular-nums}
 .н-подп{font:700 44px/1.2 var(--п);color:#dfeaf3;margin-top:44px}
+/* FAR: число + сравнение полос */
+.far-лбл{font:700 24px var(--п);letter-spacing:.06em;text-transform:uppercase;color:#90D6F7}
+.far-ряд{display:flex;align-items:baseline;gap:34px;margin-top:10px}
+.far-число{font:900 230px/.95 var(--з);letter-spacing:-.03em;color:var(--красный);white-space:nowrap;font-variant-numeric:tabular-nums;text-shadow:0 0 70px rgba(255,40,70,.4)}
+.far-бейдж{display:inline-block;padding:10px 22px;border-radius:10px;background:var(--красный);color:#fff;font:800 30px var(--п);white-space:nowrap;transform-origin:0 50%}
+.far-полосы{margin-top:34px;display:grid;grid-template-columns:300px 1fr;gap:22px 26px;align-items:center;width:1180px}
+.far-имя{font:700 28px var(--п);color:#dfeaf3;white-space:nowrap}
+.far-дор{position:relative;height:38px;border-radius:8px;background:rgba(255,255,255,.07)}
+.far-бар{position:absolute;left:0;top:0;height:100%;border-radius:8px;transform-origin:0 50%}
+.far-бар.iogp{background:#1B8A4C;width:7%}
+.far-бар.кмг{background:var(--красный);width:86.5%}
+.far-зн{position:absolute;top:50%;transform:translateY(-50%);font:800 30px var(--м);color:#fff;white-space:nowrap}
+.far-метка{position:absolute;top:-32px;left:32.2%;transform:translateX(-50%);font:600 22px var(--м);color:#9fb6c9;white-space:nowrap}
+.far-метка::after{content:'';position:absolute;left:50%;top:30px;width:2px;height:52px;background:#9fb6c9;opacity:.8}
+.far-подп{font:700 30px/1.25 var(--п);color:#9fb6c9;margin-top:36px}
 </style>
 </head>
 <body>
@@ -123,7 +138,7 @@ const светофор = v => v >= 60 ? 'к' : v >= 30 ? 'ж' : 'з';           
    ===================================================================== */
 const FPS = 30, W = 1920, H = 1080, ПЕРЕХОД = .7;
 const СЦЕНЫ = [
-  { id: 'интро',   длит: 7,  имя: 'Цифры',            подпись: '' },
+  { id: 'интро',   длит: 9,  имя: 'Цифры',            подпись: '' },
   { id: 'контуры', длит: 10, имя: 'Контуры сегодня',  подпись: 'Четыре системы фиксируют нарушение, когда оно уже случилось' },
   { id: 'индекс',  длит: 10, имя: 'Индекс риска',     подпись: 'Индекс сводит их сигналы в одну оценку — до начала работ' },
   { id: 'мастер',  длит: 10, имя: 'Экран мастера',    подпись: 'Решение принимает человек' },
@@ -237,7 +252,16 @@ const ОКНА = [окноЭНД, окноTUMAR, окноПоездки, окн�
 const КОЛ = [176, 124, 220, 104, 210, 100, 106];   // колонки таблицы нарядов
 const МАКЕТЫ = {
   интро: `<div class="abs" style="left:110px;top:58px;font:500 18px var(--м);letter-spacing:.12em;text-transform:uppercase;color:#90D6F7">Работы повышенной опасности · группа КМГ</div>
-    ${ЦИФРЫ.map(ц => `<div class="н-блок" style="left:700px;top:250px;width:1100px"><div class="н-число" style="color:${ц.цв};text-shadow:0 0 70px ${ц.цв === 'var(--янтарь)' ? 'rgba(217,142,4,.35)' : 'rgba(255,40,70,.4)'}">${ц.ч}</div><div class="н-подп">${ц.п}</div></div>`).join('')}
+    <div class="н-блок far" style="left:560px;top:230px;width:1250px">
+      <div class="far-лбл">FAR · смертельных случаев на 100 млн отработанных часов · 2025</div>
+      <div class="far-ряд"><div class="far-число">0,00</div><div class="far-бейдж">в 12 раз выше ориентира</div></div>
+      <div class="far-полосы">
+        <div class="far-имя">Ориентир IOGP</div><div class="far-дор"><div class="far-бар iogp"></div><span class="far-зн зн-iogp" style="left:9%">0,84</span></div>
+        <div class="far-имя">Подрядчики КМГ</div><div class="far-дор"><div class="far-метка">2024: 3,86</div><div class="far-бар кмг"></div><span class="far-зн зн-кмг" style="left:88.5%">10,38</span></div>
+      </div>
+      <div class="н-подп far-подп">FAR подрядных организаций КМГ, 2025 · годовой отчёт</div>
+    </div>
+    ${ЦИФРЫ.slice(1).map(ц => `<div class="н-блок" style="left:700px;top:250px;width:1100px"><div class="н-число" style="color:${ц.цв};text-shadow:0 0 70px ${ц.цв === 'var(--янтарь)' ? 'rgba(217,142,4,.35)' : 'rgba(255,40,70,.4)'}">${ц.ч}</div><div class="н-подп">${ц.п}</div></div>`).join('')}
     <div class="ист-л abs" style="left:110px;right:110px;bottom:56px;font:500 17px/1.4 var(--т);color:#8fa9c0">Источники: годовой отчёт АО НК «КазМунайГаз» за 2025 год; заседание Правительства 02.06.2026; сообщение компании за первое полугодие 2026</div>`,
 
   контуры: `${угол}<div class="rig">
@@ -420,17 +444,25 @@ const мир = el => el.firstChild;
 const АНИМАЦИЯ = {
   интро(el, lt, q) {
     q.бл ||= $$(el, '.н-блок'); q.ист ||= el.querySelector('.ист-л'); q.h ||= q.бл.map(b => b.offsetHeight);
+    q.чис ||= el.querySelector('.far-число'); q.бейдж ||= el.querySelector('.far-бейдж'); q.iogp ||= el.querySelector('.far-бар.iogp');
+    q.кмг ||= el.querySelector('.far-бар.кмг'); q.знI ||= el.querySelector('.зн-iogp'); q.знК ||= el.querySelector('.зн-кмг'); q.метка ||= el.querySelector('.far-метка');
     мир(el).style.backgroundPosition = `${-lt * 8}px ${-lt * 4}px, 0 0`;
-    // каждое число выпрыгивает справа крупно, потом уезжает в колонку слева и уменьшается
-    const АТ = [.4, 2.4, 4.4], СЛОТ = [[110, 190], [110, 480]], М = .5, ГЕРОЙ = [700, 250];
+    // FAR выпрыгивает героем: число считает до 10,38, полоса IOGP короткая, полоса КМГ растёт мимо отметки 2024 и
+    // упирается в 10,38; потом бейдж «в 12 раз». Затем блок уезжает в колонку слева, а дальше — «1 из 3» и «3».
+    const АТ = [.4, 4.2, 6.4], СЛОТ = [[110, 150], [110, 560]], М = .5, ГЕРОЙ = [[560, 230], [700, 250], [700, 250]];
     q.бл.forEach((b, i) => {
       const sc = pop(b, lt, АТ[i], .6, .6);
-      const m = i < 2 ? E.inOutCubic(prog(lt, АТ[i + 1] - .3, АТ[i + 1] + .4)) : 0, сл = СЛОТ[i] || ГЕРОЙ;
-      const x = (сл[0] - ГЕРОЙ[0]) * m + (1 - sc) * 550, y = (сл[1] - ГЕРОЙ[1]) * m + (1 - sc) * q.h[i] / 2;
+      const m = i < 2 ? E.inOutCubic(prog(lt, АТ[i + 1] - .3, АТ[i + 1] + .4)) : 0, сл = СЛОТ[i] || ГЕРОЙ[i], г = ГЕРОЙ[i];
+      const x = (сл[0] - г[0]) * m + (1 - sc) * 550, y = (сл[1] - г[1]) * m + (1 - sc) * q.h[i] / 2;
       b.style.transform = `translate(${x}px,${y}px) scale(${sc * lerp(1, М, m)})`;
     });
-    q.бл[0].firstChild.textContent = счёт(lerp(0, 10.38, E.outCubic(prog(lt, .45, 1.9))), 2);
-    q.бл[2].firstChild.textContent = String(Math.round(lerp(0, 3, E.outCubic(prog(lt, 4.45, 5.2)))));
+    const pК = E.outCubic(prog(lt, .9, 2.9));
+    q.чис.textContent = счёт(lerp(0, 10.38, pК), 2);
+    q.iogp.style.transform = `scaleX(${E.outCubic(prog(lt, .7, 1.3))})`; q.знI.style.opacity = prog(lt, 1.1, 1.4);
+    q.кмг.style.transform = `scaleX(${pК})`; q.знК.style.opacity = prog(lt, 2.7, 3.0);
+    q.метка.style.opacity = prog(lt, 1.6, 1.9) * (1 - .5 * prog(lt, 2.6, 2.9));
+    q.бейдж.style.opacity = prog(lt, 3.0, 3.1); q.бейдж.style.transform = `scale(${lerp(.6, 1, E.outBack(prog(lt, 3.0, 3.5)))})`;
+    q.бл[2].firstChild.textContent = String(Math.round(lerp(0, 3, E.outCubic(prog(lt, 6.45, 7.2)))));
     q.ист.style.opacity = prog(lt, 1.2, 1.8) * .95;
   },
 
@@ -565,8 +597,8 @@ const ITEMS = СЦЕНЫ.map(с => {
 const cx = document.getElementById('fx').getContext('2d');
 function фон(t) {
   cx.clearRect(0, 0, W, H);
-  if (t > 6.6) return;
-  const a = prog(t, 0, 1) * (1 - prog(t, 5.6, 6.6));
+  if (t > 8.6) return;
+  const a = prog(t, 0, 1) * (1 - prog(t, 7.6, 8.6));
   for (let k = 0; k < 5; k++) { const u = ((t * .22) + k / 5) % 1;
     cx.beginPath(); cx.arc(1250, 450, 120 + u * 900, 0, Math.PI * 2);
     cx.strokeStyle = `rgba(144,214,247,${.10 * (1 - u) * a})`; cx.lineWidth = 2; cx.stroke(); }

@@ -21,6 +21,21 @@
   .слои h3{display:flex;align-items:center;gap:10px}
   .слои .номер{font-family:var(--моно);font-size:15px;font-weight:600;padding:2px 8px;border:2px solid var(--чернила);border-radius:4px;background:var(--сигнал)}
   .ссылки{display:flex;gap:14px;flex-wrap:wrap;margin-top:36px}
+  .герой{margin:0 0 40px}
+  .ролик-верх{max-width:1280px}
+  @media(min-width:1100px){
+    .герой{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:44px;align-items:center}
+    .герой h1{font-size:44px;line-height:1.12}
+    .обложка .герой .лид{margin:0;font-size:20px}
+  }
+  .ролик-верх .подпись{margin:10px 0 0}
+  .ролик-верх video::cue{font-size:22px;background:rgba(4,16,28,.82)}
+  .пуск{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:14px;padding:10px 26px 10px 10px;border:0;border-radius:999px;
+        background:rgba(255,255,255,.96);color:var(--чернила);font-family:inherit;font-size:19px;font-weight:600;line-height:1;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .пуск .круг{width:56px;height:56px;border-radius:50%;background:var(--кмг);display:grid;place-items:center}
+  .пуск:hover{background:#fff}.пуск:focus-visible{outline:3px solid var(--кмг);outline-offset:3px}
+  .ролик-верх.идёт .пуск{display:none}
+  @media(max-width:800px){.пуск{font-size:15px;padding:6px 16px 6px 6px}.пуск .круг{width:40px;height:40px}}
 </style>
 </head>
 <body>
@@ -32,8 +47,22 @@
 
 <main class="страница обложка">
   <div class="полоска"></div>
-  <h1>Индекс риска работ повышенной опасности</h1>
-  <p class="лид">ИИ-оценка наряда-допуска и бригады до начала работ на опережающих индикаторах систем, которые группа КМГ уже внедряет. Для собственных и подрядных бригад.</p>
+  <div class="герой">
+  <div class="герой-текст">
+    <h1>Индекс риска работ повышенной опасности</h1>
+    <p class="лид">ИИ-оценка наряда-допуска и бригады до начала работ на опережающих индикаторах систем, которые группа КМГ уже внедряет. Для собственных и подрядных бригад.</p>
+  </div>
+  <section class="ролик-верх" aria-label="Ролик: как работает светофор наряда">
+    <div class="карточка" style="padding:0;overflow:hidden;background:#04101c;position:relative">
+      <video id="ролик" controls playsinline preload="metadata" poster="медиа/постер.jpg" style="display:block;width:100%;height:auto;aspect-ratio:16/9">
+        <source src="медиа/ролик.mp4" type="video/mp4">
+        <track kind="subtitles" src="медиа/ролик.vtt" srclang="ru" label="Русские субтитры">
+      </video>
+      <button class="пуск" type="button" aria-label="Смотреть ролик, 1 минута 19 секунд"><span class="круг"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>Смотреть ролик · 1:19</button>
+    </div>
+    <p class="подпись">Ролик · 1 мин 19 с · как работает светофор наряда. Нет звука — включите субтитры в меню плеера.</p>
+  </section>
+  </div>
 
   <div class="сетка к3">
     <div class="карточка цифра">
@@ -148,15 +177,6 @@
     </div>
   </section>
 
-  <section class="раздел ролик">
-    <h2>Ролик: как работает светофор наряда</h2>
-    <div class="карточка" style="padding:0;overflow:hidden;background:#04101c">
-      <video controls preload="metadata" poster="кадры/01_обзор.png" style="display:block;width:100%;height:auto;aspect-ratio:16/9">
-        <source src="медиа/ролик.mp4" type="video/mp4">
-      </video>
-    </div>
-  </section>
-
   <section class="раздел справка">
     <h2>Системы-источники: что это и где уже работает</h2>
     <p class="подпись" style="max-width:900px;margin-bottom:16px">Справочно для комиссий ДЗО: индекс не требует новых систем, он читает события из тех, что группа уже внедрила.</p>
@@ -195,6 +215,12 @@
     <a class="кнопка вторая" href="эффект.html">Калькулятор эффекта →</a>
   </div>
 
+  <script>
+    // крупная кнопка «Смотреть» поверх постера: у встроенного плеера кнопки воспроизведения на постере нет
+    const в = document.getElementById('ролик'), блок = в.closest('.ролик-верх');
+    блок.querySelector('.пуск').onclick = () => в.play();
+    в.addEventListener('play', () => блок.classList.add('идёт'));
+  </script>
   <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
 </main>
 </body>

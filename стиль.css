@@ -52,6 +52,8 @@ small,.подпись{font-size:var(--подпись);color:var(--второй)}
 .шапка nav a:hover{text-decoration:none;border-color:var(--линия)}
 .шапка nav a.активна{background:var(--кмг);color:#fff}
 .шапка .демо{margin-left:auto}
+@media(min-width:801px){.шапка .лого,.шапка nav a,.шапка .демо{white-space:nowrap}}
+@media(min-width:1420px){.шапка nav{flex-wrap:nowrap}}
 
 /* Плашка «демонстрационные данные» */
 .плашка{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--радиус);font-size:var(--подпись);font-weight:600;background:var(--кмг-фон);color:var(--кмг-тёмный);border:2px solid var(--кмг)}

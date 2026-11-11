@@ -37,6 +37,7 @@
   .ролик-верх.идёт .пуск{display:none}
   @media(max-width:800px){.пуск{font-size:15px;padding:6px 16px 6px 6px}.пуск .круг{width:40px;height:40px}}
 </style>
+  <script src="общее.js" defer></script>
 </head>
 <body>
 <header class="шапка"><div class="внутри">
@@ -219,7 +220,7 @@
     // крупная кнопка «Смотреть» поверх постера: у встроенного плеера кнопки воспроизведения на постере нет
     const в = document.getElementById('ролик'), блок = в.closest('.ролик-верх');
     блок.querySelector('.пуск').onclick = () => в.play();
-    в.addEventListener('play', () => блок.classList.add('идёт'));
+    в.addEventListener('play', () => { блок.classList.add('идёт'); if (!блок.dataset.раз && window.отметка) { блок.dataset.раз = '1'; window.отметка('ролик'); } });
   </script>
   <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические · ТОО «KMG Digital»</span></footer>
 </main>

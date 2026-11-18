@@ -38,11 +38,12 @@
   @media(max-width:800px){.пуск{font-size:15px;padding:6px 16px 6px 6px}.пуск .круг{width:40px;height:40px}}
 </style>
   <script src="общее.js" defer></script>
+  <script src="https://nochnik-pulse.netlify.app/t.js" data-p="hse-risk" defer></script>
 </head>
 <body>
 <header class="шапка"><div class="внутри">
  <a class="лого" href="index.html"><img src="медиа/лого_кмг.png" alt="КазМунайГаз"><span class="разделитель"></span><span class="знак"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2 L18 17 H2 Z" fill="none" stroke="#101828" stroke-width="2"/><circle cx="10" cy="13" r="1.5" fill="#101828"/><path d="M10 7v4" stroke="#101828" stroke-width="2"/></svg></span>Индекс риска</a>
- <nav><a href="index.html" class="активна">Обзор</a><a href="смена.html">Экран мастера</a><a href="карта.html">Экран ДПБ</a><a href="эффект.html">Эффект</a><a href="дорожная_карта.html">Дорожная карта</a></nav>
+ <nav><a href="index.html" data-ev="меню" data-ev-to="index.html" class="активна">Обзор</a><a href="смена.html" data-ev="меню" data-ev-to="смена.html">Экран мастера</a><a href="карта.html" data-ev="меню" data-ev-to="карта.html">Экран ДПБ</a><a href="эффект.html" data-ev="меню" data-ev-to="эффект.html">Эффект</a><a href="дорожная_карта.html" data-ev="меню" data-ev-to="дорожная_карта.html">Дорожная карта</a></nav>
  <span class="плашка демо">Демонстрационные данные</span>
 </div></header>
 
@@ -53,13 +54,13 @@
     <h1>Индекс риска работ повышенной опасности</h1>
     <p class="лид">ИИ-оценка наряда-допуска и бригады до начала работ на опережающих индикаторах систем, которые группа КМГ уже внедряет. Для собственных и подрядных бригад.</p>
   </div>
-  <section class="ролик-верх" aria-label="Ролик: как работает светофор наряда">
+  <section data-sec="ролик" class="ролик-верх" aria-label="Ролик: как работает светофор наряда">
     <div class="карточка" style="padding:0;overflow:hidden;background:#04101c;position:relative">
       <video id="ролик" controls playsinline preload="metadata" poster="медиа/постер.jpg" style="display:block;width:100%;height:auto;aspect-ratio:16/9">
         <source src="медиа/ролик.mp4?v=6" type="video/mp4">
         <track kind="subtitles" src="медиа/ролик.vtt" srclang="ru" label="Русские субтитры">
       </video>
-      <button class="пуск" type="button" aria-label="Смотреть ролик, 1 минута 19 секунд"><span class="круг"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>Смотреть ролик · 1:19</button>
+      <button class="пуск" type="button" data-ev="смотреть ролик" aria-label="Смотреть ролик, 1 минута 19 секунд"><span class="круг"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>Смотреть ролик · 1:19</button>
     </div>
     <p class="подпись">Ролик · 1 мин 19 с · как работает светофор наряда. Нет звука — включите субтитры в меню плеера.</p>
   </section>
@@ -81,12 +82,12 @@
   </div>
   <p class="подпись источники">Источники: годовой отчёт АО НК «КазМунайГаз» за 2025 год; заявление заместителя Председателя Правления на заседании Правительства 02.06.2026; сообщение компании за первое полугодие 2026.</p>
 
-  <section class="раздел">
+  <section class="раздел" data-sec="проблема">
     <h2>Четыре системы, четыре контура, ноль прогноза</h2>
     <p class="текст">ЭНД, TUMAR, «Управление поездками» и «Қорғау» фиксируют нарушение в момент, когда оно происходит, — каждая в своём контуре. Никто из них не отвечает мастеру на главный вопрос смены: какая работа и какая бригада сегодня в зоне повышенного риска.</p>
   </section>
 
-  <section class="раздел">
+  <section class="раздел" data-sec="схема контура">
     <h2>Как работает контур</h2>
     <div class="схема">
       <svg viewBox="0 0 1600 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема контура: шесть источников данных, индекс риска наряда и бригады, три исхода светофора, обратная связь из актов расследования">
@@ -178,7 +179,7 @@
     </div>
   </section>
 
-  <section class="раздел справка">
+  <section class="раздел справка" data-sec="системы-источники">
     <h2>Системы-источники: что это и где уже работает</h2>
     <p class="подпись" style="max-width:900px;margin-bottom:16px">Справочно для комиссий ДЗО: индекс не требует новых систем, он читает события из тех, что группа уже внедрила.</p>
     <div class="сетка к4">
@@ -192,7 +193,7 @@
     </div>
   </section>
 
-  <section class="раздел слои">
+  <section class="раздел слои" data-sec="три слоя">
     <h2>Три слоя</h2>
     <div class="сетка к3">
       <div class="карточка">
@@ -221,6 +222,8 @@
     const в = document.getElementById('ролик'), блок = в.closest('.ролик-верх');
     блок.querySelector('.пуск').onclick = () => в.play();
     в.addEventListener('play', () => { блок.classList.add('идёт'); if (!блок.dataset.раз && window.отметка) { блок.dataset.раз = '1'; window.отметка('ролик'); } });
+    в.addEventListener('ended', () => window.pulse && window.pulse('ролик досмотрен'));
+    let п50 = 0; в.addEventListener('timeupdate', () => { if (!п50 && в.duration && в.currentTime / в.duration > .5) { п50 = 1; window.pulse && window.pulse('ролик 50%'); } });
   </script>
   <footer class="подвал"><span>Заявка на конкурс Председателя Правления КМГ по ПБ, ОТ и ОС · 2026</span><span>Прототип, данные синтетические</span></footer>
 </main>
